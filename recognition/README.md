@@ -12,30 +12,11 @@ The features used for this project can be extracted by following the instruction
 
 ## Pretrained models
 
-We provide the pretrained recognition models for TIM here:
+We provide the pretrained recognition models for TIM [here](). with pretrained models for all recognition datasets: EPIC-100+EPIC-Sounds, Perception Test Action+Sound and AVE.
 
-[EPIC-100]()
+## Ground Truth
 
-[Perception Test]()
-
-[AVE]()
-
-## Ground-Truth
-
-We provide the necessary ground-truth files for all datasets here:
-
-[EPIC Ground Truths]()
-
-[Perception Test Ground Truths]()
-
-[AVE Ground Truths]()
-
-Each link contains a zip containing: 
-- The training split ground truth
-- The validation split ground truth
-- The video metadata of the dataset
-
-**NOTE:** These annotation files have been cleaned to be compatible with the TIM codebase.
+The Ground Truth files for TIM can be found in the main README of this repository.
 
 ## Trainig TIM for Recognition
 
@@ -103,7 +84,8 @@ You can validate a pretrained version of TIM on all the previous datasets by run
 ## Extract Predictions
 
 You can extract predictions from TIM for each ground truth annotation on all the previous datasets by running the previous commands, but changing the `--train` flag to `--extract_feats` and adding the flag `--pretrained_model /path/to/pretrained_model`. These results will be saved to a file `/output_path/features/dataset_name_dataset_split.pkl`. This will be a dictionary containing:
-```
+
+```[python]
 {
     "action": The predictied visual actions of shape (N_vids, N_vis_classes),
     "audio": The predictied audio actions of shape (N_vids, N_audio_classes),
@@ -111,7 +93,6 @@ You can extract predictions from TIM for each ground truth annotation on all the
     "a_narration_ids": The unique ids of each audio ground truth segment,
     "verb": The predictied verb classes of shape (N_vids, 97) (EPIC Only),
     "noun": The predictied noun classes of shape (N_vids, 300) (EPIC Only),
-
 }
 ```
 

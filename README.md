@@ -26,15 +26,21 @@ The requirements for TIM can be installed in a separate conda environment by run
 
 The features used for this project can be extracted by following the instructions in the `feature_extractors` folder.
 
-## Pretrained models
+## Pre-trained models
 
-You can find links to the relevant pre-trained models in the recognition and detection folders.
+You can find links to the relevant pre-trained models in the recognition, feature_extractors and detection folders.
 
 ## Ground-Truth
 
-We provide the necessary ground-truth files for all datasets here:
+We provide the necessary ground-truth files for all datasets [here]()
 
-**NOTE:** These annotation files have been preprocessed to be compatible with the TIM codebase
+The link contains a zip containing ground truth data for each dataset, consisting of: 
+- The training split ground truth
+- The validation split ground truth
+- The video metadata of the dataset
+- The feature time intervals for training and valdiation splits
+
+**NOTE:** These annotation files have been cleaned to be compatible with the TIM codebase.
 
 ## Training and Evaluating TIM
 
