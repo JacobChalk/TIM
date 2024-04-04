@@ -30,8 +30,8 @@ def parse_args():
     parser.add_argument('--dataset', default='epic', choices=['epic', 'perception', 'ave'])
     # ------------------------------ Model ---------------------------------
     parser.add_argument('--num_class', default=([97, 300, 3806], 44))
-    parser.add_argument('--num_feats', type=int, default=200)
-    parser.add_argument('--visual_input_dim', type=int, default=1024)
+    parser.add_argument('--num_feats', type=int, default=50)
+    parser.add_argument('--visual_input_dim', type=int, default=2048)
     parser.add_argument('--audio_input_dim', type=int, default=2304)
     parser.add_argument('--d_model', type=int, default=512)
     parser.add_argument('--feedfoward_scale', type=int, default=4)
@@ -91,7 +91,7 @@ def parse_args():
                         help='Lambda for audio'
                     )
     parser.add_argument('--feat_stride',
-                        default=1,
+                        default=3,
                         type=int,
                         help='context hop'
                     )
@@ -119,22 +119,30 @@ def parse_args():
     parser.add_argument('--early_stop_period', type=int, default=100)
     # ------------------------------ Optimizer ------------------------------
     parser.add_argument('--lr', '--learning-rate',
-                        default=0.001,
+                        default=1e-4,
                         type=float,
                         metavar='LR',
                         help='initial learning rate'
                     )
     parser.add_argument('--weight_decay', '--wd',
-                        default=5e-4,
+                        default=0.05,
                         type=float,
                         metavar='W',
                         help='weight decay (default: 5e-4)'
                     )
     # ------------------------------ Misc ------------------------------------
-    parser.add_argument('--model_modality', type=str, choices=['visual', 'audio', 'audio_visual'])
-    parser.add_argument('--data_modality', type=str, choices=['visual', 'audio', 'audio_visual'])
+    parser.add_argument('--model_modality', 
+                        default='audio_visual', 
+                        type=str, 
+                        choices=['visual', 'audio', 'audio_visual']
+                    )
+    parser.add_argument('--data_modality',
+                        default='visual' 
+                        type=str, 
+                        choices=['visual', 'audio', 'audio_visual']
+                    )
     parser.add_argument('--output_dir', type=Path)
-    parser.add_argument('--disable_wandb_log', action='store_true')
+    parser.add_argument('--enable_wandb_log', action='store_true')
     parser.add_argument('--train', action='store_true')
     parser.add_argument('--validate', action='store_true')
     parser.add_argument('--extract_feats', action='store_true')
@@ -150,7 +158,7 @@ def parse_args():
                         help='Pin memory in dataloader'
                     )
     parser.add_argument('--print-freq', '-p',
-                        default=20,
+                        default=100,
                         type=int,
                         metavar='N',
                         help='print frequency (default: 20)'
@@ -189,7 +197,6 @@ def parse_args():
 
     if args.validate:
         assert args.pretrained_model != ""
-        args.disable_wandb_log = True
 
     if args.seed == -1:
         args.seed = random.randint(0, 2**32 - 1)

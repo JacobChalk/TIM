@@ -3,7 +3,6 @@ import torch
 import json
 import subprocess
 import numpy as np
-import os
 import argparse
 
 from joblib import Parallel, delayed

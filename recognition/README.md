@@ -1,4 +1,4 @@
-# TIM: A Time Interval Machine for Audio-Visual Action Recognition
+# TIM: A Time Interval Machine for Audio-Visual Action Recognition - Recognition Variant
 
 ## Requirements
 
@@ -24,9 +24,18 @@ We provide the pretrained recognition models for TIM here:
 
 We provide the necessary ground-truth files for all datasets here:
 
-[Train-Split]()
+[EPIC Ground Truths]()
 
-**NOTE:** These annotation files have been cleaned to be compatible with the TIM codebase
+[Perception Test Ground Truths]()
+
+[AVE Ground Truths]()
+
+Each link contains a zip containing: 
+- The training split ground truth
+- The validation split ground truth
+- The video metadata of the dataset
+
+**NOTE:** These annotation files have been cleaned to be compatible with the TIM codebase.
 
 ## Trainig TIM for Recognition
 
@@ -89,12 +98,24 @@ To train TIM on AVE, run:
 
 ## Validation
 
-### EPIC-KITCHENS-100 & EPIC-Sounds
+You can validate a pretrained version of TIM on all the previous datasets by running the previous commands, but changing the `--train` flag to `--validate` and adding the flag `--pretrained_model /path/to/pretrained_model`.
 
-### Perception Test Action & Perception Test Sound
+## Extract Predictions
 
-### AVE
+You can extract predictions from TIM for each ground truth annotation on all the previous datasets by running the previous commands, but changing the `--train` flag to `--extract_feats` and adding the flag `--pretrained_model /path/to/pretrained_model`. These results will be saved to a file `/output_path/features/dataset_name_dataset_split.pkl`. This will be a dictionary containing:
+```
+{
+    "action": The predictied visual actions of shape (N_vids, N_vis_classes),
+    "audio": The predictied audio actions of shape (N_vids, N_audio_classes),
+    "v_narration_ids": The unique ids of each visual ground truth segment,
+    "a_narration_ids": The unique ids of each audio ground truth segment,
+    "verb": The predictied verb classes of shape (N_vids, 97) (EPIC Only),
+    "noun": The predictied noun classes of shape (N_vids, 300) (EPIC Only),
 
+}
+```
+
+This dictionary can be manipulated into the correct format for sumbission to the [EPIC-Kitchens Action Recognition Challenge](https://github.com/epic-kitchens/C1-Action-Recognition).
 
 ## License
 

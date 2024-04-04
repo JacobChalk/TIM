@@ -155,8 +155,6 @@ class AudioVisualFeatureEncoding(nn.Module):
         # Modality encodings
         self.visual_modality_encoding = nn.Parameter(torch.empty((1, 1, 2*d_model), requires_grad=True))
         self.audio_modality_encoding = nn.Parameter(torch.empty((1, 1, 2*d_model), requires_grad=True))
-        # self.visual_modality_encoding = nn.Parameter(torch.empty((1, 1, d_model), requires_grad=True))
-        # self.audio_modality_encoding = nn.Parameter(torch.empty((1, 1, d_model), requires_grad=True))
         normal_(self.visual_modality_encoding, std=0.01)
         normal_(self.audio_modality_encoding, std=0.01)
 
@@ -195,15 +193,11 @@ class AudioVisualFeatureEncoding(nn.Module):
                         )
                     + self.visual_modality_encoding)
 
-        # vis_embed = vis_embed + time_encodings[:, :self.num_feats, :] + self.visual_modality_encoding
-
         aud_embed = (torch.cat(
                             [aud_embed, time_encodings[:, self.num_feats:2*self.num_feats, :]],
                             dim=-1
                         )
                     + self.audio_modality_encoding)
-
-        # aud_embed = aud_embed + time_encodings[:, self.num_feats:2*self.num_feats, :] + self.audio_modality_encoding
 
         seq = torch.cat([vis_embed, aud_embed], dim=1)
 
@@ -228,10 +222,6 @@ class AudioVisualFeatureEncoding(nn.Module):
                     )
                     + self.visual_modality_encoding)
 
-
-                # visual_verb_cls = visual_verb_cls + query_time_encoding[:, :num_v_queries] + self.visual_modality_encoding
-                # visual_noun_cls = visual_noun_cls + query_time_encoding[:, :num_v_queries] + self.visual_modality_encoding
-
                 seq = torch.cat([seq, visual_verb_cls, visual_noun_cls], dim=1)
 
 
@@ -243,8 +233,6 @@ class AudioVisualFeatureEncoding(nn.Module):
                 )
                 + self.visual_modality_encoding)
 
-            # visual_action_cls = visual_action_cls + query_time_encoding[:, :num_v_queries] + self.visual_modality_encoding
-
             seq = torch.cat([seq, visual_action_cls], dim=1)
 
         if "audio" in self.data_modality and num_a_queries > 0:
@@ -255,9 +243,6 @@ class AudioVisualFeatureEncoding(nn.Module):
                     dim=-1
                 )
                 + self.audio_modality_encoding)
-
-            # audio_action_cls = audio_action_cls + query_time_encoding[:, -num_a_queries:] + self.audio_modality_encoding
-
 
             seq = torch.cat([seq, audio_action_cls], dim=1)
 

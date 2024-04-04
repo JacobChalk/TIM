@@ -10,7 +10,7 @@ from timm.models import create_model
 from torch.utils.data import Dataset
 import cv2
 
-import modeling_finetune
+import modeling_finetune # Important, needed to initialise models
 from torchvision import transforms
 import video_transforms as video_transforms
 import volume_transforms as volume_transforms
@@ -170,8 +170,13 @@ def extract_feature(args):
 
     groups = df_vid.groupby('video_id')
     all_vids = [(id, group) for id, group in groups]
-    rank = int(os.environ['SLURM_LOCALID'])
-    world_size = int(os.environ['SLURM_NTASKS'])
+    if 'SLURM_LOCALID' in os.environ:
+        rank = int(os.environ['SLURM_LOCALID'])
+        world_size = int(os.environ['SLURM_NTASKS'])
+    else:
+        rank = 0
+        world_size = 1
+        
     torch.cuda.set_device(rank)
     rank_vids = [vid for i,vid in enumerate(all_vids) if (i % world_size) == rank]
 

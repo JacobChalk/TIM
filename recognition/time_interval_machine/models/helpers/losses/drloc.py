@@ -8,11 +8,6 @@ def position_sampling(k, m, n):
 
 
 def collect_samples(x, pos, n):
-    # _, c, h = x.size()
-    # x = x.view(n,c,-1).permute(1,0,2).reshape(c, -1)
-    # pos = ((torch.arange(n).long().to(pos.device) * h).view(n,1) + pos).view(-1)
-    # return (x[:, pos]).view(c, n, -1).permute(1, 0, 2)
-
     _, l, D = x.size()
     x = x.permute(2,0,1).reshape(D, -1)
     pos = ((torch.arange(n).long().to(pos.device) * l).view(n,1) + pos).view(-1)

@@ -23,7 +23,7 @@ from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.models import create_model
 from timm.utils import ModelEma
 
-import modeling_finetune
+import modeling_finetune # Important, needed to initialise models
 import utils
 from datasets import build_dataset
 from engine_for_finetuning import (

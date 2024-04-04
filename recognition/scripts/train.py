@@ -92,7 +92,7 @@ def init_train(args):
         val_iters = checkpoint["val_iters"]
 
 
-    if not args.disable_wandb_log and is_master_proc:
+    if args.enable_wandb_log and is_master_proc:
         wandb_log = True
         wandb.init(project='time_prompting', config=args)
         wandb.run.log_code(".")
@@ -338,16 +338,6 @@ def train_epoch(
                                         model,
                                         args.m_drloc
                                     )
-                    # drloc_loss = drl.dense_relative_localization_loss(
-                    #                     output[1][:, :length],
-                    #                     model,
-                    #                     args.m_drloc
-                    #                 )
-                    # drloc_loss += drl.dense_relative_localization_loss(
-                    #                     output[1][:, length:],
-                    #                     model,
-                    #                     args.m_drloc
-                    #                 )
                 else:
                     drloc_loss = drl.dense_relative_localization_loss(
                                         output[1],

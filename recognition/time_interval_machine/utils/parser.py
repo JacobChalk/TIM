@@ -126,7 +126,7 @@ def parse_args():
     parser.add_argument('--extract_feats', action='store_true')
     # ------------------------------ Misc ------------------------------------
     parser.add_argument('--output_dir', type=Path)
-    parser.add_argument('--disable_wandb_log', action='store_true')
+    parser.add_argument('--enable_wandb_log', action='store_true')
     parser.add_argument('--seed', default=0, type=int, help='Random Seed')
     parser.add_argument('--print-freq', '-p',
                         default=100,
@@ -179,8 +179,7 @@ def parse_args():
 
     if args.validate:
         assert args.pretrained_model != ""
-        args.disable_wandb_log = True
-
+        
     if args.seed == -1:
         args.seed = random.randint(0, 2**32 - 1)
 

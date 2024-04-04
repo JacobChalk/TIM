@@ -1,4 +1,4 @@
-# TIM: A Time Interval Machine for Audio-Visual Action Recognition
+# TIM: A Time Interval Machine for Audio-Visual Action Recognition - Feature Extractors
 
 ## Requirements
 

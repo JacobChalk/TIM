@@ -83,9 +83,9 @@ def init_train(args):
         scaler.load_state_dict(checkpoint["scaler"])
         training_iters = checkpoint["training_iters"]
 
-    if not args.disable_wandb_log and is_master_proc:
+    if args.enable_wandb_log and is_master_proc:
         wandb_log = True
-        wandb.init(project='time_prompting', config=args, mode="offline")
+        wandb.init(project='TIM', config=args, mode="offline")
         wandb.run.log_code(".")
         wandb.watch(model)
     else:

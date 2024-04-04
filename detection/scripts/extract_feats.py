@@ -1,7 +1,6 @@
 import numpy as np
 import random
 import torch
-import math
 import os
 
 import time_interval_machine.datasets.loader as loader

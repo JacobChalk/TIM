@@ -67,22 +67,9 @@ class TIM(nn.Module):
                             nn.ReLU(),
                             nn.Linear(self.d_model, self.d_model),
                             nn.ReLU(),
-                            # nn.Linear(self.d_model, self.d_model),
-                            # nn.ReLU(),
-                            # nn.Linear(self.d_model, self.d_model),
-                            # nn.ReLU(),
                             nn.LayerNorm(self.d_model)
                         )
-        # self.time_mlp = nn.Sequential(
-        #                     nn.Linear(1, self.d_model // 2),
-        #                     nn.ReLU(),
-        #                     nn.Linear(self.d_model // 2, self.d_model // 2),
-        #                     nn.ReLU(),
-        #                     nn.Linear(self.d_model // 2, self.d_model // 2),
-        #                     nn.ReLU(),
-        #                     nn.LayerNorm(self.d_model // 2)
-        #                 )
-
+        
         if self.input_modality == "audio_visual":
             self.feature_encoding = AudioVisualFeatureEncoding(
                                         self.visual_input_dim,
@@ -117,17 +104,13 @@ class TIM(nn.Module):
 
         if self.data_modality == "audio_visual":
             self.cls_head = head.AudioVisualCLSHead(self.num_class, 2*self.d_model)
-            # self.cls_head = head.AudioVisualCLSHead(self.num_class, self.d_model)
         elif self.data_modality == "visual":
             self.cls_head = head.VisualCLSHead(self.num_class[0], 2*self.d_model)
-            # self.cls_head = head.VisualCLSHead(self.num_class[0], self.d_model)
         else:
             self.cls_head = head.AudioCLSHead(self.num_class[1], 2*self.d_model)
-            # self.cls_head = head.AudioCLSHead(self.num_class[1], self.d_model)
 
         encoder_layer = TransformerEncoderLayer(
                             d_model=2*self.d_model,
-                            # d_model=self.d_model,
                             nhead=self.nhead,
                             dim_feedforward=self.dim_feedforward,
                             dropout=self.enc_dropout,
@@ -141,13 +124,10 @@ class TIM(nn.Module):
 
         # For MLP
         self.drloc_mlp = nn.Sequential(
-                                # nn.Linear(2*self.d_model, self.d_model),
                                 nn.Linear(4*self.d_model, self.d_model),
                                 nn.ReLU(),
                                 nn.Linear(self.d_model, self.d_model),
                                 nn.ReLU(),
-                                # nn.Linear(self.d_model, self.d_model),
-                                # nn.ReLU(),
                                 nn.Linear(self.d_model, 1)
                             )
 

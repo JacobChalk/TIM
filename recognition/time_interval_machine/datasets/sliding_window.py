@@ -108,13 +108,13 @@ class SlidingWindowDataset(data.Dataset):
 
         self.max_window_actions = self.max_visual_actions + self.max_audio_actions
         logger.info((f"{mode.capitalize()} Sliding Window dataset constructed. Total Actions: {self.num_actions}\n\
-                      \t\t\t\tNumber of {self.window_size} Second Windows: {len(self.windows)}\n\
-                      \t\t\t\tMax actions in window: {self.max_window_actions}\n\
-                      \t\t\t\t\tVisual: {self.max_visual_actions}\n\
-                      \t\t\t\t\tAudio: {self.max_audio_actions}\n\
-                      \t\t\t\tMin Query Size: {self.min_query}\n\
-                      \t\t\t\tMax Query Size: {self.max_query}\n\
-                      \t\t\t\tAvg. Queries per Window: {self.avg_query}"))
+                    \t\t\t\tNumber of {self.window_size} Second Windows: {len(self.windows)}\n\
+                    \t\t\t\tMax actions in window: {self.max_window_actions}\n\
+                    \t\t\t\t\tVisual: {self.max_visual_actions}\n\
+                    \t\t\t\t\tAudio: {self.max_audio_actions}\n\
+                    \t\t\t\tMin Query Size: {self.min_query}\n\
+                    \t\t\t\tMax Query Size: {self.max_query}\n\
+                    \t\t\t\tAvg. Queries per Window: {self.avg_query}"))
 
     def cache_features(
                     self,

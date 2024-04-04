@@ -18,7 +18,7 @@ PENDING
 
 ## Requirements
 
-The requirements for TIM can be installed in a separate conda environment by running the following command in your terminal: `$ conda env create -f environment.yml`. You can then activate this with `conda activate TIM`.
+The requirements for TIM can be installed in a separate conda environment by running the following command in your terminal: `conda env create -f environment.yml`. You can then activate this with `conda activate TIM`.
 
 **NOTE:** This environment only applies to the `recognition` and `detection` folders. Seperate requirements are listed for the backbones in the `feature_extractors` folder.
 
