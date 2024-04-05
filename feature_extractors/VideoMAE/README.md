@@ -1,7 +1,7 @@
 # TIM: A Time Interval Machine for Audio-Visual Action Recognition - VideoMAE Backbone
 
 
-This section of code is a condensed version of VideoMAE, used for TIM, from the [InternVideo GitHub](https://github.com/OpenGVLab/InternVideo). 
+This section of code is a condensed version of [VideoMAE](https://github.com/MCG-NJU/VideoMAE), used for TIM, from the [InternVideo GitHub](https://github.com/OpenGVLab/InternVideo). 
 
 ## Requirements
 
