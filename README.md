@@ -34,7 +34,7 @@ You can find links to the relevant pre-trained models in the recognition, featur
 
 ## Ground-Truth
 
-We provide the necessary ground-truth files for all datasets [here]()
+We provide the necessary ground-truth files for all datasets [here]().
 
 The link contains a zip containing ground truth data for each dataset, consisting of: 
 - The training split ground truth
