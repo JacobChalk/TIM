@@ -40,7 +40,7 @@ You can find links to the relevant pre-trained models in the recognition, featur
 
 ## Ground-Truth
 
-We provide the necessary ground-truth files for all datasets [here]().
+We provide the necessary ground-truth files for all datasets [here](https://www.dropbox.com/scl/fi/5fm3p7fvdt5noa34teulu/annotations.zip?rlkey=lhgjdvzbuopc9ghlvdhgrv5ix&dl=0).
 
 The link contains a zip containing ground truth data for each dataset, consisting of:
 
