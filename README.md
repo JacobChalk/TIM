@@ -2,8 +2,9 @@
 
 This repository provides the code used to implement the model proposed in the paper:
 
-Jacob Chalk, Jaesung Huh, Evangelos Kazakos, Andrew Zisserman, Dima Damen, TIM: A Time Interval Machine for Audio-Visual Action Recognition, CVPR, 2024
+Jacob Chalk\*, Jaesung Huh\*, Evangelos Kazakos, Andrew Zisserman, Dima Damen, TIM: A Time Interval Machine for Audio-Visual Action Recognition, CVPR, 2024
 
+(\* indicates equal contribution.)
 [Project Webpage](https://jacobchalk.github.io/TIM-Project)
 
 [ArXiv Paper]()
