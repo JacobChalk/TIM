@@ -13,6 +13,7 @@ python merge_features.py /path/to/omnivore_features /path/to/videomae_features -
 ```
 
 ## Reference
+
 The code in the following subfolders are modified versions of the [Omnivore](https://github.com/beasteers/ego_actrecog_analysis), [Auditory SlowFast](https://github.com/ekazakos/auditory-slow-fast) and [VideoMAE](https://github.com/MCG-NJU/VideoMAE)/[InternVideo](https://github.com/OpenGVLab/InternVideo) repositories.
 We also recommend you to read the papers below for details of each model:
 
