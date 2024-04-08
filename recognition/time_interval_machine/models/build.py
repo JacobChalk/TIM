@@ -32,7 +32,8 @@ def build_model(args, gpu_id=None):
                 input_modality=args.model_modality,
                 data_modality=args.data_modality,
                 num_feats=args.num_feats,
-                include_verb_noun=args.include_verb_noun
+                include_verb_noun=args.include_verb_noun,
+                pool_features=args.apply_feature_pooling
             )
 
     if args.num_gpus:

@@ -33,6 +33,11 @@ def parse_args():
                         type=int,
                         help='Context hop'
                     )
+    parser.add_argument('--feat_gap',
+                        default=0.2,
+                        type=float,
+                        help='Time between extracted features'
+                    )
     parser.add_argument('--window_stride',
                         default=1.0,
                         type=float,
@@ -60,6 +65,11 @@ def parse_args():
                         type=str,
                         choices=['visual', 'audio', 'audio_visual'],
                         help='Modality of the input features'
+                    )
+    parser.add_argument('--apply_feature_pooling', 
+                        default=False,
+                        type=str2bool, 
+                        help='Apply Audio-Guided Spatial Pooling to input features'
                     )
     # ------------------------------ Train ----------------------------------
     parser.add_argument('--finetune_epochs',
@@ -188,5 +198,8 @@ def parse_args():
 
     if args.dataset == 'perception':
         args.num_class = (63, 17)
+    
+    if args.dataset == 'ave':
+        args.num_class = (29, 29)
 
     return args

@@ -12,7 +12,11 @@ The features used for this project can be extracted by following the instruction
 
 ## Pretrained models
 
-We provide the pretrained recognition models for TIM [here](). with pretrained models for all recognition datasets: EPIC-100+EPIC-Sounds, Perception Test Action+Sound and AVE.
+We provide the pretrained recognition models in the following:
+
+- [EPIC-KITCHENS-100+EPIC-SOUNDS](https://www.dropbox.com/scl/fi/taqoclgnhjyeoapnb61pq/epic_100_epic_sounds.pth.tar?rlkey=wbfcnlbpdzf3lt35w6ugtc44w&dl=0)
+- [Perception Test Action + Sound](https://www.dropbox.com/scl/fi/xzt8rbl19cumgl0v3gl2d/percetion_test_action_sound.pth.tar?rlkey=qsd7vbpddnftpk4mjq4j8dpnm&dl=0)
+- [AVE]()
 
 ## Ground Truth
 
@@ -21,6 +25,7 @@ The Ground Truth files for TIM can be found in the main README of this repositor
 ## Trainig TIM for Recognition
 
 ### EPIC-KITCHENS-100 & EPIC-Sounds
+
 To train TIM jointly on EPIC-KITCHENS-100 and EPIC-Sounds, run:
 
 ```[bash]
@@ -46,6 +51,7 @@ python scripts/run_net.py \
 **NOTE:** Either dataset can be trained individually by changing the `data_modality` flag to either `audio` or `visual`. To use only audio or visual features change the `model_modality` flag to `audio` or `visual`.
 
 ### Perception Test Action & Perception Test Sound
+
 To train TIM jointly on Perception Test Action & Perception Test Sound, run:
 
 ```[bash]
@@ -58,13 +64,14 @@ python scripts/run_net.py \
 --video_train_context_pickle /path/to/perception_test_action_train_visual_feature_intervals \
 --video_val_context_pickle /path/to/perception_test_action_validation_visual_feature_intervals \
 --visual_input_dim <channel-size-of-visual-features> \
---audio_data_path /path/perception_test_audio_features \
+--audio_data_path /path/to/perception_test_audio_features \
 --audio_train_action_pickle /path/to/perception_test_sound_train_annotations \
 --audio_val_action_pickle /path/to/perception_test_sound_validation_annotations \
 --audio_train_context_pickle /path/to/perception_test_sound_train_audio_feature_intervals \
 --audio_val_context_pickle /path/to/perception_test_sound_validation_audio_feature_intervals \
 --audio_input_dim <channel-size-of-audio-features> \
 --video_info_pickle /path/to/perception_test_video_metadata \
+--dataset perception \
 --feat_stride 2 \
 --feat_dropout 0.1 \
 --seq_dropout 0.1 \
@@ -72,9 +79,39 @@ python scripts/run_net.py \
 ```
 
 ### AVE
-To train TIM on AVE, run:
-```
 
+To train TIM on AVE, run:
+
+```[bash]
+python scripts/run_net.py \
+--train \
+--output_dir /path/to/output \
+--video_data_path /path/to/AVE_visual_features \
+--video_train_action_pickle /path/to/AVE_train_annotations \
+--video_val_action_pickle /path/to/AVE_validation_annotations \
+--video_train_context_pickle /path/to/AVE_visual_feature_intervals \
+--video_val_context_pickle /path/to/AVE_validation_visual_feature_intervals \
+--visual_input_dim <channel-size-of-visual-features> \
+--audio_data_path /path/to/AVE_audio_features \
+--audio_train_action_pickle /path/to/AVE_train_annotations \
+--audio_val_action_pickle /path/to/AVE_validation_annotations \
+--audio_train_context_pickle /path/to/AVE_train_audio_feature_intervals \
+--audio_val_context_pickle /path/to/AVE_audio_feature_intervals \
+--audio_input_dim <channel-size-of-audio-features> \
+--video_info_pickle /path/to/AVE_video_metadata \
+--dataset ave \
+--feat_stride 1 \
+--feat_gap 1.0 \
+--num_feats 10 \
+--feat_dropout 0.1 \
+--seq_dropout 0.1 \
+--d_model 256 \
+--apply_feature_pooling True \
+--lr 5e-4 \
+--lambda_audio 0.1 \
+--lambda_drloc 0.1 \
+--mixup_alpha 0.5 \
+--include_verb_noun False
 ```
 
 ## Validation

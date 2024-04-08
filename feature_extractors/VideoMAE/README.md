@@ -1,7 +1,6 @@
 # TIM: A Time Interval Machine for Audio-Visual Action Recognition - VideoMAE Backbone
 
-
-This section of code is a condensed version of [VideoMAE](https://github.com/MCG-NJU/VideoMAE), used for TIM, from the [InternVideo GitHub](https://github.com/OpenGVLab/InternVideo). 
+This section of code is a condensed version of [VideoMAE](https://github.com/MCG-NJU/VideoMAE), used for TIM, from the [InternVideo GitHub](https://github.com/OpenGVLab/InternVideo).
 
 ## Requirements
 
@@ -15,7 +14,7 @@ You will also need to download the pretrained VideoMAE provided by InternVideo, 
 
 Once you have done the above, you can train VideoMAE with:
 
-```
+```[bash]
 python -u run_class_finetuning.py \
     --model vit_large_patch16_224 \
     --data_set EK100 \
@@ -46,13 +45,13 @@ python -u run_class_finetuning.py \
     --enable_deepspeed
 ```
 
-If you are unable to train VideoMAE yourself, we provided our pretrained model [here]()
+If you are unable to train VideoMAE yourself, we provided our pretrained model [here](https://www.dropbox.com/scl/fi/kr14exj9ipfcoth01thld/videomae_epic.pth.tar?rlkey=d9jqjqp2b3zy1440qcbdog3x4&dl=0).
 
 ## Extracting VideoMAE Features EPIC
 
 To extract the VideoMAE Features for EPIC, run:
 
-```
+```[bash]
 python -u feature_extraction.py \
 --data_path /path/to/extracted/epic-frames \
 --save_path /path/to/save/features \

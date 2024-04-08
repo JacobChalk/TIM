@@ -14,7 +14,13 @@ The features used for this project can be extracted by following the instruction
 
 ## Pretrained models
 
-We provide the pretrained detection models for TIM [here](). This file contains a subfolder with pretrained models for all detection tasks: EPIC-100-Verb, EPIC-100-Noun, Perception Test Action and Perception Test Sound.
+We provide the pretrained detection models in the following:
+
+- [EPIC-KITCHENS-100 Verb](https://www.dropbox.com/scl/fi/tstv5yps3qznfyqthowl4/epic_100_verb.pth.tar?rlkey=blzpf62l6xjt3aefzaj6ruie3&dl=0)
+- [EPIC-KITCHENS-100 Noun](https://www.dropbox.com/scl/fi/lyafhr1zn692k4ol66xjr/epic_100_noun.pth.tar?rlkey=y4urlvtqyagwskkijxig7mehh&dl=0)
+- [EPIC-Sounds](https://www.dropbox.com/scl/fi/s11osizv5m3synp1aodfg/epic_sounds.pth.tar?rlkey=4nk5rc9saetfcs0kc5b25li9t&dl=0)
+- [Perception Test Action](https://www.dropbox.com/scl/fi/jzucxr64s9970bgb78n9n/perception_test_action.pth.tar?rlkey=pqi8n2khj222eu1j5p8c3c2nj&dl=0)
+- [Perception Test Sound](https://www.dropbox.com/scl/fi/80fx6uz30dn9owyntdnt9/perception_test_sound.pth.tar?rlkey=4nytiwvad9nmeyrl3ng6a8nd2&dl=0)
 
 ## Ground Truth
 
@@ -22,7 +28,8 @@ The Ground Truth files for TIM can be found in the main README of this repositor
 
 ## Trainig TIM for Detection
 
-### EPIC-KITCHENS-100:
+### EPIC-KITCHENS-100
+
 To train TIM on EPIC-KITCHENS-100 for verbs, run:
 
 ```[bash]
@@ -42,7 +49,25 @@ python scripts/run_net.py \
 
 The noun version of TIM can be run by running the above and changing `--verb_only False`.
 
+To train TIM on EPIC-SOUNDS, run:
+
+```[bash]
+python scripts/run_net.py \
+--train \
+--output_dir /path/to/output \
+--video_data_path /path/to/epic_visual_features \
+--video_train_context_pickle /path/to/epic_train_visual_feature_intervals \
+--visual_input_dim <channel-size-of-visual-features> \
+--audio_data_path /path/to/epic_audio_features \
+--audio_train_action_pickle /path/to/epic_sounds_train_annotations \
+--audio_train_context_pickle /path/to/epic_train_audio_feature_intervals \
+--audio_input_dim <channel-size-of-audio-features> \
+--video_info_pickle /path/to/epic_kitchens_video_metadata \
+--data_modality 'audio'
+```
+
 ### Perception Test Action & Perception Test Sound
+
 To train TIM on Perception Test Action, run:
 
 ```[bash]
@@ -99,11 +124,34 @@ python scripts/run_net.py \
 
 This will extract dense predictions across the validation set and save it to `/path/to/output/features/EPIC_100_validation.pth.tar`. You can then evaluate the extract predictions. First, change directory to `eval_detection`. To evaluate EPIC-100, run:
 
-```
-python format_prediction_epic.py /path/to/output/predictions /path/to/groud/truth/annotations --task <task-of-model>
+```[bash]
+python format_prediction_epic.py /path/to/output/features/EPIC_100_validation.pth.tar /path/to/groud/truth/annotations --task <task-of-model>
 ```
 
 Where `<task-of-model>` refers to `verb` or `noun`.
+
+To validate TIM on EPIC-Sounds, run:
+
+```[bash]
+python scripts/run_net.py \
+--extract_feats \
+--output_dir /path/to/output \
+--video_data_path /path/to/epic_visual_features \
+--video_val_context_pickle /path/to/epic_val_visual_feature_intervals \
+--visual_input_dim <channel-size-of-visual-features> \
+--audio_data_path /path/to/epic_audio_features \
+--audio_val_action_pickle /path/to/epic_sounds_val_annotations \
+--audio_val_context_pickle /path/to/epic_val_audio_feature_intervals \
+--audio_input_dim <channel-size-of-audio-features> \
+--video_info_pickle /path/to/epic_kitchens_video_metadata \
+--data_modality 'audio'
+```
+
+This will extract dense predictions across the validation set and save it to `/path/to/output/features/EPIC_Sounds_validation.pth.tar`. You can then evaluate the extract predictions. First, change directory to `eval_detection`. To evaluate EPIC-Sounds, run:
+
+```[bash]
+python format_prediction.py /path/to/output/features/EPIC_SOUNDS_validation.pth.tar /path/to/groud/truth/annotations
+```
 
 To evaluate Perception Test Action, or Perception Test Sound run
 
@@ -124,7 +172,7 @@ python scripts/run_net.py \
 
 To extract dense predictions, then run:
 
-```
+```[bash]
 python format_prediction.py /path/to/output/predictions /path/to/groud/truth/annotations
 ```
 

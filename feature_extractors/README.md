@@ -16,7 +16,7 @@ python merge_features.py /path/to/omnivore_features /path/to/videomae_features -
 The code in the following subfolders are modified versions of the [Omnivore](https://github.com/beasteers/ego_actrecog_analysis), [Auditory SlowFast](https://github.com/ekazakos/auditory-slow-fast) and [VideoMAE](https://github.com/MCG-NJU/VideoMAE)/[InternVideo](https://github.com/OpenGVLab/InternVideo) repositories.
 We also recommend you to read the papers below for details of each model:
 
-```bibtex
+```[bibtex]
 @ARTICLE{Kazakos2021SlowFastAuditory,
    title={Slow-Fast Auditory Streams For Audio Recognition},
    author={Kazakos, Evangelos and Nagrani, Arsha and Zisserman, Andrew and Damen, Dima},

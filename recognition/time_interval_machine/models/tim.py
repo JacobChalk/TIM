@@ -9,6 +9,7 @@ import time_interval_machine.utils.logging as logging
 
 from time_interval_machine.models.helpers.encodings import AudioVisualFeatureEncoding, VisualFeatureEncoding, AudioFeatureEncoding
 from time_interval_machine.models.helpers.transformers import TransformerEncoder, TransformerEncoderLayer
+from time_interval_machine.models.helpers.pool import AVGA
 
 
 logger = logging.get_logger(__name__)
@@ -29,6 +30,7 @@ class TIM(nn.Module):
                 data_modality="audio_visual",
                 num_feats=50,
                 include_verb_noun=True,
+                pool_features=False
             ):
         super(TIM, self).__init__()
 
@@ -49,6 +51,7 @@ class TIM(nn.Module):
         self.num_feats = num_feats
         self.num_class = num_class
         self.include_verb_noun = include_verb_noun
+        self.pool_features = pool_features
 
         logger.info("Building {} Transformer with {}-D, {} heads, and {} layers.".format(
                                                             self.input_modality,
@@ -131,6 +134,16 @@ class TIM(nn.Module):
                                 nn.Linear(self.d_model, 1)
                             )
 
+        if self.pool_features:
+            self.pool = AVGA(
+                    a_dim=self.audio_input_dim,
+                    v_dim=self.visual_input_dim,
+                    hidden_size=self.visual_input_dim
+            )
+        else:
+            self.pool = None
+
+
     def forward_encoder(
                 self,
                 inputs,
@@ -138,6 +151,9 @@ class TIM(nn.Module):
                 num_v_queries,
                 num_a_queries
             ):
+        
+        if self.pool_features:
+            inputs[0] = self.pool(inputs[1], inputs[0])
 
         # Project features to lower dim and include time and modality encodings
         x = self.feature_encoding(inputs, time_encodings, num_v_queries, num_a_queries) # Shape: [S, B, C]

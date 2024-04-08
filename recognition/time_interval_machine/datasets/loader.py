@@ -36,6 +36,7 @@ def create_loader(args, split, modality, generator):
                     a_feature_dim=args.audio_input_dim,
                     num_feats=args.num_feats,
                     feat_stride=args.feat_stride,
+                    feat_gap=args.feat_gap,
                     window_stride=args.window_stride,
                     mode=split,
                     data_modality=modality,
