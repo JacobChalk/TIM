@@ -2,7 +2,7 @@
 
 ## Requirements
 
-The requirements and installation instructions for TIM can be found in the main folder of this repository.
+The requirements and installation instructions for TIM can be found in the main README of this repository.
 
 Be sure to export the relevant directories to your Python Path, e.g. `export PYTHONPATH=/path/to/TIM/recognition/time_interval_machine:path/to/TIM/recognition/scripts:$PYTHONPATH`.
 
