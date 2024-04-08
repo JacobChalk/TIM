@@ -2,7 +2,7 @@
 
 ## Requirements
 
-The requirements for TIM can be found in the main README of this repository. For detection, in addition to the requirements, you must set up the C++ NMS using `python setup.py install --user`.
+The requirements and installation instructions for TIM can be found in the main README of this repository. For detection, in addition to the requirements, you must set up the C++ NMS using `python setup.py install --user`.
 
 Be sure to export the relevant directories to your Python Path, e.g. `export PYTHONPATH=/path/to/TIM/detection/time_interval_machine:path/to/TIM/detection/scripts:$PYTHONPATH`.
 
