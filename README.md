@@ -8,7 +8,7 @@ Jacob Chalk\*, Jaesung Huh\*, Evangelos Kazakos, Andrew Zisserman, Dima Damen, T
 
 [Project Webpage](https://jacobchalk.github.io/TIM-Project)
 
-[ArXiv Paper]()
+[ArXiv Paper](https://arxiv.org/abs/2404.05559)
 
 ## Citing
 
