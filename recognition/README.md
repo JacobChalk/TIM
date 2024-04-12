@@ -16,7 +16,7 @@ We provide the pretrained recognition models in the following:
 
 - [EPIC-KITCHENS-100 + EPIC-SOUNDS](https://www.dropbox.com/scl/fi/taqoclgnhjyeoapnb61pq/epic_100_epic_sounds.pth.tar?rlkey=wbfcnlbpdzf3lt35w6ugtc44w&dl=0)
 - [Perception Test Action + Sound](https://www.dropbox.com/scl/fi/xzt8rbl19cumgl0v3gl2d/percetion_test_action_sound.pth.tar?rlkey=qsd7vbpddnftpk4mjq4j8dpnm&dl=0)
-- [AVE]()
+- [AVE](https://www.dropbox.com/scl/fi/gzbbkscgfbim6qmx1wi13/ave.tar?rlkey=0l1os6atvvvrq2yhje3jbnkdu&dl=0)
 
 ## Ground Truth
 
