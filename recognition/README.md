@@ -15,6 +15,7 @@ The features used for this project can be extracted by following the instruction
 We provide the pretrained recognition models in the following:
 
 - [EPIC-KITCHENS-100 + EPIC-SOUNDS](https://www.dropbox.com/scl/fi/taqoclgnhjyeoapnb61pq/epic_100_epic_sounds.pth.tar?rlkey=wbfcnlbpdzf3lt35w6ugtc44w&dl=0)
+- [EPIC-KITCHENS-100 (Visual-Only)](https://www.dropbox.com/scl/fi/udqes9jcyl1at05xljdgn/epic_visual_only.pth.tar?rlkey=56pe4jjnlyjxg1o2tris4npyi&st=ih7fyqvp&dl=0)
 - [Perception Test Action + Sound](https://www.dropbox.com/scl/fi/xzt8rbl19cumgl0v3gl2d/percetion_test_action_sound.pth.tar?rlkey=qsd7vbpddnftpk4mjq4j8dpnm&dl=0)
 - [AVE](https://www.dropbox.com/scl/fi/gzbbkscgfbim6qmx1wi13/ave.tar?rlkey=0l1os6atvvvrq2yhje3jbnkdu&dl=0)
 
