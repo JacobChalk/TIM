@@ -50,10 +50,6 @@ class Perception(torch.utils.data.Dataset):
             for ii, tup in enumerate(pd.read_pickle(file).iterrows()):
                 for idx in range(self._num_clips):
                     record = PerceptionVideoRecord(tup)
-                    # For debugging purposes, we will only load one video
-                    # if record.untrimmed_video_name == 'video_3848':
-                    #     self._video_records.append(record)
-                    #     self._spatial_temporal_idx.append(idx)
                     
                     # For running on whole dataset
                     self._video_records.append(record)

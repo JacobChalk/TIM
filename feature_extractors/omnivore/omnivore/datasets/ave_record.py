@@ -24,15 +24,15 @@ class AVEVideoRecord(VideoRecord):
     @property
     def fps(self):
         return self._series['fps']
-    
+
     @property
     def start_frame(self):
-        return int(round(timestamp_to_sec(self._series['start_timestamp']) * self.fps))
+        return int(self._series['start_frame'])
 
     @property
     def end_frame(self):
-        return int(round(timestamp_to_sec(self._series['stop_timestamp']) * self.fps))
-
+        return int(self._series['stop_frame'])
+    
     @property
     def num_frames(self):
         return self.end_frame - self.start_frame

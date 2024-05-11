@@ -16,10 +16,6 @@ class PerceptionVideoRecord(VideoRecord):
     def __init__(self, tup):
         self._index = str(tup[0])
         self._series = tup[1]
-
-    @property
-    def participant(self):
-        return self._series['video_id']
     
     @property
     def untrimmed_video_name(self):
@@ -39,8 +35,8 @@ class PerceptionVideoRecord(VideoRecord):
 
     @property
     def label(self):
-        return {'verb': self._series['verb_class'] if 'verb_class' in self._series else -1,
-                'noun': self._series['noun_class'] if 'noun_class' in self._series else -1}
+        # Dummy for feature extraction
+        return {'verb': -1, 'noun': -1}
 
     @property
     def metadata(self):

@@ -44,13 +44,9 @@ class Epicsounds(torch.utils.data.Dataset):
         for tup in pd.read_pickle(path_annotations_pickle).iterrows():
             for idx in range(self._num_clips):
                 record = EpicSoundsAudioRecord(tup, sr=self.cfg.AUDIO_DATA.SAMPLING_RATE)
-                # For debugging purporses, only load 'P01'
-                if record.participant == 'P01':
-                    self._audio_records.append(record)
-                    self._temporal_idx.append(idx)
 
-                # self._audio_records.append(record)
-                # self._temporal_idx.append(idx)
+                self._audio_records.append(record)
+                self._temporal_idx.append(idx)
         assert (
                 len(self._audio_records) > 0
         ), "Failed to load EPIC-SOUNDS split from {}".format(

@@ -1,16 +1,4 @@
 from .video_record import VideoRecord
-from datetime import timedelta
-import time
-
-
-def timestamp_to_sec(timestamp):
-    x = time.strptime(timestamp, '%H:%M:%S.%f')
-    sec = float(timedelta(hours=x.tm_hour,
-                          minutes=x.tm_min,
-                          seconds=x.tm_sec).total_seconds()) + float(
-                                  timestamp.split('.')[-1][:2]) / 100
-    return sec
-
 
 class EpicKitchensVideoRecord(VideoRecord):
     def __init__(self, tup):
@@ -19,7 +7,7 @@ class EpicKitchensVideoRecord(VideoRecord):
 
     @property
     def participant(self):
-        return self._series['participant_id']
+        return self._series['video_id'].split('_')[0]
 
     @property
     def untrimmed_video_name(self):
@@ -27,11 +15,11 @@ class EpicKitchensVideoRecord(VideoRecord):
 
     @property
     def start_frame(self):
-        return int(round(timestamp_to_sec(self._series['start_timestamp']) * self.fps))
+        return int(self._series['start_frame'])
 
     @property
     def end_frame(self):
-        return int(round(timestamp_to_sec(self._series['stop_timestamp']) * self.fps))
+        return int(self._series['stop_frame'])
 
     @property
     def fps(self):

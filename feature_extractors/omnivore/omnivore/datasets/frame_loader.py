@@ -29,9 +29,6 @@ def temporal_sampling(num_frames, start_idx, end_idx, num_samples, start_frame=0
 
 def pack_frames_to_video_clip(cfg, video_record, dataset='epickitchens'):
     # Load video by loading its extracted frames
-    # path_to_video = '{}/rgb_frames/{}'.format(cfg.EPICKITCHENS.VISUAL_DATA_DIR,
-    #                                              #video_record.participant,
-    #                                              video_record.untrimmed_video_name)
     if dataset == 'epickitchens':
         path_to_video = '{}/{}/rgb_frames/{}'.format(cfg.EPICKITCHENS.VISUAL_DATA_DIR,
                                                     video_record.participant,

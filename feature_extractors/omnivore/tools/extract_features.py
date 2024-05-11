@@ -40,9 +40,6 @@ def perform_feature_extraction(test_loader, model, test_meter, cfg):
     test_meter.iter_tic()
 
     for cur_iter, (inputs, labels, video_idx, meta) in enumerate(test_loader):
-        # For debugging...
-        if cur_iter == 10:
-            break
 
         # Transfer the data to the current GPU device.
         if isinstance(inputs, (list,)):

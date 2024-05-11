@@ -50,11 +50,6 @@ class Epickitchens(torch.utils.data.Dataset):
             for ii, tup in enumerate(pd.read_pickle(file).iterrows()):
                 for idx in range(self._num_clips):
                     record = EpicKitchensVideoRecord(tup)
-                    # For debugging purposes, we will only load the first participant
-                    # if record.participant == 'P01':
-                    #     print(record.participant)
-                    #     self._video_records.append(record)
-                    #     self._spatial_temporal_idx.append(idx)
                     
                     # For running on whole dataset
                     self._video_records.append(record)

@@ -36,11 +36,11 @@ class AVEAudioRecord(AudioRecord):
     
     @property
     def start_audio_sample(self):
-        return int(round(timestamp_to_sec(self._series['start_timestamp']) * self.sr))
+        return int(round(self._series['start_sec'] * self.sr))
 
     @property
     def end_audio_sample(self):
-        return int(round(timestamp_to_sec(self._series['stop_timestamp']) * self.sr))
+        return int(round(self._series['stop_sec'] * self.sr))
 
     @property
     def num_audio_samples(self):
@@ -48,9 +48,8 @@ class AVEAudioRecord(AudioRecord):
 
     @property
     def label(self):
-        # Dummy
-        return {'verb': self._series['verb_class'] if 'verb_class' in self._series else -1,
-                'noun': self._series['noun_class'] if 'noun_class' in self._series else -1}
+        # Dummy for feature extraction
+        return {'verb': -1, 'noun': -1}
 
     @property
     def metadata(self):
