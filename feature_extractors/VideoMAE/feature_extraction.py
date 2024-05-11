@@ -236,7 +236,8 @@ def extract_feature(args):
                 with torch.no_grad():
                     feature = model.forward_features(input_data)
                     feature_list.extend(feature.cpu().numpy())
-            all_sets.extend(np.vstack(feature_list))
+            all_sets.append(np.vstack(feature_list))
+            
         if args.num_aug > 1:
             all_sets = np.stack(all_sets, axis=1)
         else:
