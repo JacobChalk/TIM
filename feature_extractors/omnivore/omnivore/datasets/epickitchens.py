@@ -10,7 +10,7 @@ import random
 import omnivore.utils.logging as logging
 
 from .build import DATASET_REGISTRY
-from .epickitchens_record import EpicKitchensVideoRecord, timestamp_to_sec
+from .epickitchens_record import EpicKitchensVideoRecord
 
 from . import autoaugment as autoaugment
 from . import transform as transform

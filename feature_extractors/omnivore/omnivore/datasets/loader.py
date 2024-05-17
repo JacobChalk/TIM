@@ -62,6 +62,8 @@ def construct_loader(cfg, split):
     assert split in ["train", "val", "test", "train+val"]
     dataset_name = cfg.TEST.DATASET
     batch_size = int(cfg.TEST.BATCH_SIZE / cfg.NUM_GPUS)
+    if int (cfg.TEST.BATCH_SIZE % cfg.NUM_GPUS) != 0:
+        print("**Warning: batch size is not divisible by the number of GPUs**")
     shuffle = False
     drop_last = False
 

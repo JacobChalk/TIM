@@ -105,7 +105,6 @@ class Ave(torch.utils.data.Dataset):
 
         frames = pack_frames_to_video_clip(self.cfg, self._video_records[index], self.cfg.TEST.DATASET)
 
-        
         if self.cfg.DATA.USE_RAND_AUGMENT and (temporal_sample_index != 0):
             # Transform to PIL Image
             frames = [transforms.ToPILImage()(frame.squeeze().numpy()) for frame in frames]
@@ -124,9 +123,13 @@ class Ave(torch.utils.data.Dataset):
             # To Tensor: T H W C
             frames = [torch.tensor(np.array(frame)) for frame in frames]
             frames = torch.stack(frames)
-
+            
         # For omnivore style frame transform
-        scale = min_scale/frames.shape[1]
+        if frames.shape[1] < frames.shape[2]:
+            scale = min_scale / frames.shape[1]
+        else:
+            scale = min_scale / frames.shape[2]
+
         frames = [
                 cv2.resize(
                     img_array.numpy(),
@@ -156,6 +159,9 @@ class Ave(torch.utils.data.Dataset):
         )
         label = self._video_records[index].label
         metadata = self._video_records[index].metadata
+        if frames.shape[-1] == 49:
+            print(self._video_records.untrimmed_video_name)
+
         return frames, label, index, metadata
 
 

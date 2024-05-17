@@ -1,14 +1,14 @@
 # Video feature extraction
 
-This repo contains the audio feature extraction code for Epic-Sounds, Perception Test and AVE dataset.
+This repo contains the video feature extraction code for Epic-KITCHENS, Perception Test and AVE dataset.
 
 ## Environment
 
 We recommend you to use conda environment.
 
 ```[bash]
-conda create -n tim_asf python=3.10
-conda activate tim_asf
+conda create -n tim_video python=3.10
+conda activate tim_video
 pip install -r requirements.txt
 ```
 
@@ -28,7 +28,7 @@ A download script is provided for the videos [here](https://github.com/epic-kitc
 
 ### Run the EPIC-KITCHENS-100 feature extraction
 
-First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/slowfast:$PYTHONPATH`, then run the following command:
+First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/omnivore:$PYTHONPATH`, then run the following command:
 
 ```[bash]
 python tools/run_net.py \
@@ -37,7 +37,7 @@ python tools/run_net.py \
   OUTPUT_DIR /path/to/output/dataset_split \
   EPICKITCHENS.VISUAL_DATA_DIR /path/to/epic_frames \
   EPICKITCHENS.TEST_LIST /path/to/EPIC_100_feature_interval_times \
-  TRAIN.ENABLE False \
+  TEST.BATCH_SIZE <batch_size> \
   TEST.ENABLE True \
   TEST.NUM_FEATURES <num_features>
 ```
@@ -49,6 +49,7 @@ NUM_GPUS : number of gpus you use for extraction.
 OUTPUT_DIR : output directory to save the features for dataset split
 EPICKITCHENS.VISUAL_DATA_DIR : directory path which contains the extracted frames for EPIC-KITCHENS-100
 EPICKITCHENS.TEST_LIST : pickle file containing time intervals for each feature in the EPIC-KITCHENS-100 dataset split
+TEST.BATCH_SIZE : batch size should be a multiple of NUM_GPUS
 TEST.CHECKPOINT_FILE_PATH : pretrained checkpoint file path
 TEST.NUM_FEATURES : Number of feature sets for each time segment. 1 for validation and test set (unaugmented) and 4 for train set (unaugmented+augmented sets).
 ```
@@ -96,7 +97,7 @@ Visit the official [perception_test website](https://github.com/google-deepmind/
 
 ### Run the Perception Test feature extraction
 
-First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/slowfast:$PYTHONPATH`, then run the following command:
+First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/omnivore:$PYTHONPATH`, then run the following command:
 
 ```[bash]
 python tools/run_net.py 
@@ -105,7 +106,7 @@ NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 PERCEPTION.VISUAL_DATA_DIR /path/to/perception_test_frames \
 PERCEPTION.TEST_LIST /path/to/PERCEPTION_feature_interval_times \
-TRAIN.ENABLE False \
+TEST.BATCH_SIZE <batch_size> \
 TEST.ENABLE True \
 TEST.NUM_FEATURES <num_features>
 ```
@@ -117,6 +118,7 @@ NUM_GPUS : number of gpus you use for extraction. For audio, 1 is enough since i
 OUTPUT_DIR : output directory to save the features for dataset split
 PERCEPTION.VISUAL_DATA_DIR : directory path which contains the extracted frames for Perception Test
 PERCEPTION.TEST_LIST : pickle file containing time intervals for each feature in the Perception Test dataset split
+TEST.BATCH_SIZE : batch size should be a multiple of NUM_GPUS
 TEST.CHECKPOINT_FILE_PATH : pretrained checkpoint file path
 TEST.NUM_FEATURES : Number of feature sets for each time segment. 1 for validation and test set (unaugmented) and 4 for train set (unaugmented+augmented sets).
 ```
@@ -161,16 +163,16 @@ To extract the frames, please refer to [utils/ave/extract_frames.py](utils/ave/e
 
 ### Run AVE feature extraction
 
-First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/slowfast:$PYTHONPATH`, then run the following command:
+First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/omnivore:$PYTHONPATH`, then run the following command:
 
 ```[bash]
 python tools/run_net.py 
---cfg /path/to/configs/AVE/SLOWFAST_R50.yml \
+--cfg /path/to/configs/AVE/OMNIVORE_feature.yml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 AVE.VISUAL_DATA_DIR /path/to/AVE_frames \
 AVE.TEST_LIST /path/to/AVE_feature_interval_times \
-TRAIN.ENABLE False \
+TEST.BATCH_SIZE <batch_size> \
 TEST.ENABLE True \
 TEST.NUM_FEATURES <num_features>
 ```
@@ -182,6 +184,7 @@ NUM_GPUS : number of gpus you use for extraction.
 OUTPUT_DIR : output directory to save the features for dataset split
 AVE.VISUAL_DATA_DIR : directory path which contains the extracted frames for AVE
 AVE.TEST_LIST : pickle file containing time intervals for each feature in the AVE dataset split
+TEST.BATCH_SIZE : batch size should be a multiple of NUM_GPUS
 TEST.CHECKPOINT_FILE_PATH : pretrained checkpoint file path
 TEST.NUM_FEATURES : Number of feature sets for each time segment. 1 for validation and test set (unaugmented) and 4 for train set (unaugmented+augmented sets).
 ```
