@@ -38,6 +38,8 @@ python -u run_class_finetuning.py \
     --drop_path 0.2 \
     --head_drop_rate 0.3 \
     --layer_decay 0.8 \
+    --mixup 0.0 \
+    --cutmix 0.0 \
     --epochs 50 \
     --test_num_segment 2 \
     --test_num_crop 3 \
