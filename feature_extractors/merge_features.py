@@ -52,7 +52,7 @@ def main(args):
 
     matched_splits = [folder for folder in omnivore_splits if folder in videomae_splits]
 
-    assert len(matched_splits) > 0, "No matching splits found. Ensure the features are stored as <backbone>/{train,val,test}/<video>.npy"
+    assert len(matched_splits) == 0, "No matching splits found. Ensure the features are stored as <backbone>/{train,val,test}/<video>.npy"
 
     for split in matched_splits:
         omnivore_features = os.listdir(f"{args.omnivore_feature_path}/{split}")
