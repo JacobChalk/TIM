@@ -4,3 +4,4 @@ __pycache__/
 *$py.class
 
 *.sh
+recognition/precomputed_windows

@@ -167,7 +167,11 @@ class SlidingWindowDataset(data.Dataset):
             v_actions = pd.read_pickle(v_labels_pkl)
             v_actions["start_sec"] = v_actions["start_timestamp"].apply(timestamp_to_seconds)
             v_actions["stop_sec"] = v_actions["stop_timestamp"].apply(timestamp_to_seconds)
-            v_actions["class_id"] = [-1] * v_actions.shape[0]
+            if self.dataset_name == 'ave':
+                v_actions["action_class"] = v_actions["class_id"]
+            else:
+                v_actions["class_id"] = [-1] * v_actions.shape[0]
+
             if "verb_class" not in v_actions.columns:
                 v_actions["verb_class"] = [-1] * v_actions.shape[0]
                 v_actions["noun_class"] = [-1] * v_actions.shape[0]
@@ -316,7 +320,8 @@ class SlidingWindowDataset(data.Dataset):
 
     def create_windows_path(self, v_labels_pkl, a_labels_pkl):
         windows_path = "precomputed_windows/"
-
+        os.makedirs(windows_path, exist_ok=True)
+        
         if "visual" in self.data_modality:
             if self.dataset_name not in str(v_labels_pkl).lower():
                 windows_path += f"{self.dataset_name.upper()}_"

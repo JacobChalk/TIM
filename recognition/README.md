@@ -81,7 +81,7 @@ python scripts/run_net.py \
 
 ### AVE
 
-To train TIM on AVE, run:
+To train TIM on AVE with vgg features, run:
 
 ```[bash]
 python scripts/run_net.py \
@@ -115,6 +115,39 @@ python scripts/run_net.py \
 --include_verb_noun False
 ```
 
+To train TIM with Omnivore + AuditorySlowFast features, run
+```[bash]
+python scripts/run_net.py \
+--train \
+--output_dir /path/to/output \
+--video_data_path /path/to/AVE_visual_features \
+--video_train_action_pickle /path/to/AVE_train_annotations \
+--video_val_action_pickle /path/to/AVE_validation_annotations \
+--video_train_context_pickle /path/to/AVE_visual_feature_intervals \
+--video_val_context_pickle /path/to/AVE_validation_visual_feature_intervals \
+--visual_input_dim <channel-size-of-visual-features> \
+--audio_data_path /path/to/AVE_audio_features \
+--audio_train_action_pickle /path/to/AVE_train_annotations \
+--audio_val_action_pickle /path/to/AVE_validation_annotations \
+--audio_train_context_pickle /path/to/AVE_train_audio_feature_intervals \
+--audio_val_context_pickle /path/to/AVE_audio_feature_intervals \
+--audio_input_dim <channel-size-of-audio-features> \
+--video_info_pickle /path/to/AVE_video_metadata \
+--dataset ave \
+--feat_stride 2 \
+--feat_gap 0.2 \
+--num_feats 25 \
+--feat_dropout 0.1 \
+--seq_dropout 0.1 \
+--d_model 256 \
+--apply_feature_pooling False \
+--lr 5e-4 \
+--lambda_audio 1 \
+--lambda_drloc 0.1 \
+--mixup_alpha 0.5 \
+--include_verb_noun False
+```
+
 ## Validation
 
 You can validate a pretrained version of TIM on all the previous datasets by running the previous commands, but changing the `--train` flag to `--validate` and adding the flag `--pretrained_model /path/to/pretrained_model`.
@@ -125,8 +158,8 @@ You can extract predictions from TIM for each ground truth annotation on all the
 
 ```[python]
 {
-    "action": The predictied visual actions of shape (N_vids, N_vis_classes),
-    "audio": The predictied audio actions of shape (N_vids, N_audio_classes),
+    "action": The predicted visual actions of shape (N_vids, N_vis_classes),
+    "audio": The predicted audio actions of shape (N_vids, N_audio_classes),
     "v_narration_ids": The unique ids of each visual ground truth segment,
     "a_narration_ids": The unique ids of each audio ground truth segment,
     "verb": The predictied verb classes of shape (N_vids, 97) (EPIC Only),
