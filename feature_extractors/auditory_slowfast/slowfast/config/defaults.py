@@ -88,8 +88,7 @@ _C.TEST.BATCH_SIZE = 8
 # Path to the checkpoint to load the initial weight.
 _C.TEST.CHECKPOINT_FILE_PATH = ""
 
-# Number of clips to sample from an audio uniformly for aggregating the
-# prediction results.
+# Number of features you extract from each clip. If NUM_FEATURES > 1, we apply SpecAugment to the audio inputn.
 _C.TEST.NUM_FEATURES = 1
 
 # Path to saving prediction results file.

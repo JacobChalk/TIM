@@ -50,7 +50,7 @@ python tools/run_net.py
 --cfg /path/to/configs/EPIC-SOUNDS/SLOWFAST_R50.yml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
-EPICSOUNDS.AUDIO_DATA_DIR /path/to/EPICSOUNDS_audio_files \
+EPICSOUNDS.AUDIO_DATA_FILE /path/to/EPICSOUNDS_audio_files \
 EPICSOUNDS.TEST_LIST /path/to/EPICSOUNDS_feature_interval_times \
 TRAIN.ENABLE False \
 TEST.ENABLE True \
@@ -63,11 +63,13 @@ The parameters are explained below:
 ```[bash]
 NUM_GPUS : number of gpus you use for extraction. For audio, 1 is enough since it doesn't take a lot of time.
 OUTPUT_DIR : output directory to save the features for dataset split
-EPICSOUNDS.AUDIO_DATA_DIR : directory path which contains audio files for EPIC-SOUNDS
+EPICSOUNDS.AUDIO_DATA_FILE : hdf5 path which contains audio waveforms for EPIC-SOUNDS
 EPICSOUNDS.TEST_LIST : pickle file containing time intervals for each feature in the EPIC-SOUNDS dataset split
 TEST.CHECKPOINT_FILE_PATH : pretrained checkpoint file path
 TEST.NUM_FEATURES : Number of feature sets for each time segment. 1 for validation and test set (unaugmented) and 3 for train set (unaugmented+augmented sets).
 ```
+
+This script will produce `features.npy` and `metadata.npy` in OUTPUT_DIR. `metadata.npy` is only for debugging. You need to rearrange `features.npy` by video_ids.
 
 **NOTE:** The above command will need to be run **per dataset split** i.e. for train, val and test.
 
@@ -91,10 +93,17 @@ output_dir
     ...                 
 ```
 
-To make this, run the following code. You need to change the `feature_list`, `metafile_list` and `out_dir` on your own.
+To make this, run the following code. You need to change the `feature_file`, `pickle_file` and `out_dir` on your own.
 
 ```python
-python utils/make_npyfiles.py
+python utils/make_npyfiles.py --feature_file FEATURE_FILE --pickle_file PICKLE_FILE --out_dir OUT_DIR
+```
+
+The parameters are expalined below.
+```[bash]
+feature_file : 'features.npy' that you generated from the previous step.
+pickle_file : The pickle file that contains time intervals with narration_id and video_ids. EPICSOUNDS.TEST_LIST in above example.
+out_dir : output directory to save the rearranged features. We recommend to put the split name ('train', 'val' or 'test) at the end. (ex - /path/to/outputs/{train,val,test})
 ```
 
 ## Perception test
@@ -139,6 +148,8 @@ TEST.CHECKPOINT_FILE_PATH : pretrained checkpoint file path
 TEST.NUM_FEATURES : Number of feature sets for each time segment. 1 for validation and test set (unaugmented) and 3 for train set (unaugmented+augmented sets).
 ```
 
+This script will produce `features.npy` and `metadata.npy` in OUTPUT_DIR. `metadata.npy` is only for debugging. You need to rearrange `features.npy` by video_ids.
+
 **NOTE:** The above command will need to be run **per dataset split** i.e. for train, val and test.
 
 ### Post processing Perception Test features
@@ -157,10 +168,17 @@ output_dir
     ...                  
 ```
 
-To make this, run the following code. You need to change the `feature_list`, `metafile_list` and `out_dir` on your own.
+To make this, run the following code. You need to change the `feature_file`, `pickle_file` and `out_dir` on your own.
 
 ```python
-python utils/make_npyfiles.py
+python utils/make_npyfiles.py --feature_file FEATURE_FILE --pickle_file PICKLE_FILE --out_dir OUT_DIR
+```
+
+The parameters are expalined below.
+```[bash]
+feature_file : 'features.npy' that you generated from the previous step.
+pickle_file : The pickle file that contains time intervals with narration_id and video_ids. PERCEPTION.TEST_LIST in above example.
+out_dir : output directory to save the rearranged features. We recommend to put the split name ('train', 'val' or 'test) at the end. (ex - /path/to/outputs/{train,val,test})
 ```
 
 ## AVE
@@ -206,6 +224,8 @@ TEST.CHECKPOINT_FILE_PATH : pretrained checkpoint file path
 TEST.NUM_FEATURES : Number of feature sets for each time segment. 1 for validation and test set (unaugmented) and 5 for train set (unaugmented+augmented sets).
 ```
 
+This script will produce `features.npy` and `metadata.npy` in OUTPUT_DIR. `metadata.npy` is only for debugging. You need to rearrange `features.npy` by video_ids.
+
 **NOTE:** The above command will need to be run **per dataset split** i.e. for train, val and test.
 
 ### Post processing AVE features
@@ -228,8 +248,15 @@ output_dir
     ...                
 ```
 
-To make this, run the following code. You need to change the `feature_list`, `metafile_list` and `out_dir` on your own.
+To make this, run the following code. You need to change the `feature_file`, `pickle_file` and `out_dir` on your own.
 
-```[python]
-python utils/make_npyfiles.py
+```python
+python utils/make_npyfiles.py --feature_file FEATURE_FILE --pickle_file PICKLE_FILE --out_dir OUT_DIR
+```
+
+The parameters are expalined below.
+```[bash]
+feature_file : 'features.npy' that you generated from the previous step.
+pickle_file : The pickle file that contains time intervals with narration_id and video_ids. AVE.TEST_LIST in above example.
+out_dir : output directory to save the rearranged features. We recommend to put the split name ('train', 'val' or 'test) at the end. (ex - /path/to/outputs/{train,val,test})
 ```
