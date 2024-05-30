@@ -22,7 +22,7 @@ def main(args):
 
     for i in tqdm.tqdm(range(len(feature_pandas))):
         annotation_id = feature_pandas.iloc[i].name
-        # annotation_id = feature_pandas.iloc[i]['narration_id']  --> Use this for AVE and Perception test
+        # annotation_id = feature_pandas.iloc[i]['narration_id']
         vid_id = feature_pandas.iloc[i]['video_id']
         if vid_id not in result_dict:
             result_dict[vid_id] = {}
