@@ -6,6 +6,9 @@ This section of code is a condensed version of [VideoMAE](https://github.com/MCG
 
 Instructions on how to install the necessary packages can be found on the InternVideo GitHub [here](https://github.com/OpenGVLab/InternVideo/blob/main/InternVideo1/Pretrain/VideoMAE/README.md).
 
+## Download the Data
+Please refer to the [Omnivore ReadME](https://github.com/JacobChalk/TIM/blob/main/feature_extractors/omnivore/README.md) for information on how to download the data for each dataset.
+
 ## Training VideoMAE on EPIC
 
 To replicate our pretrained VideoMAE model on EPIC-KITCHENS-100, you will first need to download the EPIC-100 videos and extract the frames. Instructions can be found [here](https://github.com/epic-kitchens/epic-kitchens-100-annotations/blob/master/README.md#erratum). You will also need to download the annotations given [here](https://github.com/epic-kitchens/epic-kitchens-100-annotations).
