@@ -15,12 +15,13 @@ Jacob Chalk\*, Jaesung Huh\*, Evangelos Kazakos, Andrew Zisserman, Dima Damen, T
 When using this code, please reference:
 
 ```[bibtex]
-@InProceedings{Chalk2024TIM,
+@InProceedings{Chalk_2024_CVPR,
     author    = {Chalk, Jacob and Huh, Jaesung and Kazakos, Evangelos and Zisserman, Andrew and Damen, Dima},
-    title     = {{TIM}: {A} {T}ime {I}nterval {M}achine for {A}udio-{V}isual {A}ction {R}ecognition},
+    title     = {TIM: A Time Interval Machine for Audio-Visual Action Recognition},
     booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
     month     = {June},
-    year      = {2024}
+    year      = {2024},
+    pages     = {18153-18163}
 }
 ```
 
