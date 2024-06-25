@@ -45,6 +45,6 @@ def run(
         )
     except Exception as e:
         raise e
-    print(local_rank)
+
     torch.cuda.set_device(local_rank)
     func(cfg)
