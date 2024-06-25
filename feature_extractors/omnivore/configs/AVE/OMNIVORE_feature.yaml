@@ -8,7 +8,6 @@ DATA:
   FRAME_SAMPLING: 'like omnivore'
   USE_RAND_AUGMENT: True
 MODEL:
-  NUM_CLASSES: 28
   ARCH: omnivore_swinB
   MODEL_NAME: Omnivore
   LOSS_FUNC: cross_entropy
