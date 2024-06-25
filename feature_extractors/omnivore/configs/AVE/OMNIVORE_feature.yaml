@@ -8,12 +8,12 @@ DATA:
   FRAME_SAMPLING: 'like omnivore'
   USE_RAND_AUGMENT: True
 MODEL:
-  NUM_CLASSES: [97, 300]
   ARCH: omnivore_swinB
   MODEL_NAME: Omnivore
   LOSS_FUNC: cross_entropy
   DROPOUT_RATE: 0.5
 TEST:
+  NUM_CLASSES: 28
   ENABLE: True
   DATASET: ave
   BATCH_SIZE: 4
