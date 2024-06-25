@@ -8,12 +8,12 @@ DATA:
   FRAME_SAMPLING: 'like omnivore'
   USE_RAND_AUGMENT: True
 MODEL:
+  NUM_CLASSES: [97, 300]
   ARCH: omnivore_swinB_epic
   MODEL_NAME: Omnivore
   LOSS_FUNC: cross_entropy
   DROPOUT_RATE: 0.5
 TEST:
-  NUM_CLASSES: [97, 300]
   ENABLE: True
   DATASET: epickitchens
   BATCH_SIZE: 4
