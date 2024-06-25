@@ -46,6 +46,7 @@ def perform_test(test_loader, model, test_meter, cfg):
 
         if isinstance(labels, (dict,)):
             # Gather all the predictions across all the devices to perform ensemble.
+            # You don't need to use preds or labels but just in case if you want to evaluate the model, we'll keep it.
             if cfg.NUM_GPUS > 1:
                 verb_preds, verb_labels, audio_idx = du.all_gather(
                     [preds[0], labels['verb'], audio_idx]
@@ -53,6 +54,9 @@ def perform_test(test_loader, model, test_meter, cfg):
 
                 noun_preds, noun_labels, audio_idx = du.all_gather(
                     [preds[1], labels['noun'], audio_idx]
+                )
+                feature, audio_idx = du.all_gather(
+                    [feature, audio_idx]
                 )
                 meta = du.all_gather_unaligned(meta)
                 metadata = {'narration_id': []}
@@ -69,6 +73,7 @@ def perform_test(test_loader, model, test_meter, cfg):
                 noun_preds = noun_preds.cpu()
                 noun_labels = noun_labels.cpu()
                 audio_idx = audio_idx.cpu()
+                feature = feature.cpu()
 
             test_meter.iter_toc()
 
