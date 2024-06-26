@@ -25,7 +25,7 @@ parser.add_argument(
 parser.add_argument(
     "--score_threshold",
     type=float,
-    default=0.03,
+    default=0.01,
     help = "Preprocessing score threshold"
 )
 parser.add_argument(
