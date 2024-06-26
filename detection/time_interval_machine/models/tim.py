@@ -148,7 +148,6 @@ class TIM(nn.Module):
             end_times = start_times + query_size
             layer_times = torch.stack([start_times, end_times], dim=-1)
             layer_times = torch.round(layer_times, decimals=3)
-            layer_times = layer_times[:, (layer_times[1, :] <= 1.0)]
             queries.append(layer_times)
             query_size *= 2
 
