@@ -27,7 +27,7 @@ def parse_args():
                         default=False,
                         help='Train model jointly on verb, noun and action (EPIC-100 only)'
                     )
-    parser.add_argument('--dataset', default='epic', choices=['epic', 'perception', 'ave'])
+    parser.add_argument('--dataset', default='epic', choices=['epic', 'perception'])
     # ------------------------------ Model ---------------------------------
     parser.add_argument('--num_class', default=([97, 300, 3806], 44))
     parser.add_argument('--num_feats', type=int, default=50)
