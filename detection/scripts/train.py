@@ -123,8 +123,6 @@ def init_train(args):
                     {
                         'epoch': epoch + 1,
                         'state_dict': sd,
-                        'best_acc1': 0,
-                        'best_acc1': 0,
                         'optimizer': optimizer.state_dict(),
                         'lr_scheduler': lr_scheduler.state_dict(),
                         'warmup_scheduer': warmup_scheduler.state_dict(),
