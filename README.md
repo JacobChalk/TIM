@@ -50,7 +50,7 @@ The link contains a zip containing ground truth data for each dataset, consistin
 - The video metadata of the dataset
 - The feature time intervals for training and valdiation splits
 
-**NOTE:** These annotation files have been cleaned to be compatible with the TIM codebase.
+**NOTE:** These annotation files have been altered to be compatible with the TIM codebase.
 
 ## Training and Evaluating TIM
 
