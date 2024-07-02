@@ -210,7 +210,7 @@ class SlidingWindowDataset(data.Dataset):
         if not os.path.exists(windows_path):
             for vid, data in video_info.iterrows():
                 video_duration = math.ceil(data['duration'])
-                vid_feat_times = self.v_feat_times[vid]
+                vid_feat_times = self.v_feat_times[vid] if 'visual' in self.model_modality else self.a_feat_times[vid]
                 num_windows_in_vid = max(math.ceil((math.ceil(video_duration) - self.window_size) / self.window_stride) + 1, 1)
                 vid_actions = actions.get_group(vid).copy()
 
