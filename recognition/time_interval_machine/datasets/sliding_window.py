@@ -249,7 +249,7 @@ class SlidingWindowDataset(data.Dataset):
 
                         actions_in_segment = actions_in_segment[full_queries | partial_queries]
                         if actions_in_segment.shape[0] > 0:
-                            vid_feat_times = self.v_feat_times[vid]
+                            vid_feat_times = self.v_feat_times[vid] if 'visual' in self.model_modality else self.a_feat_times[vid]
                             win_feats = self.get_window_features(vid_feat_times, win_start, win_stop)
                             self.min_query = min(self.min_query, min(actions_in_segment['partial_duration'].tolist()))
                             self.max_query = max(self.max_query, max(actions_in_segment['partial_duration'].tolist()))
