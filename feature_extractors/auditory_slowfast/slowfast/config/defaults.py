@@ -40,44 +40,9 @@ _C.BN.NUM_SYNC_DEVICES = 1
 
 
 # ---------------------------------------------------------------------------- #
-# Training options.
-# ---------------------------------------------------------------------------- #
-_C.TRAIN = CfgNode()
-
-# If True Train the model, else skip training.
-_C.TRAIN.ENABLE = True
-
-# Dataset.
-_C.TRAIN.DATASET = "vggsound"
-
-# Total mini-batch size.
-_C.TRAIN.BATCH_SIZE = 64
-
-# Evaluate model on test data every eval period epochs.
-_C.TRAIN.EVAL_PERIOD = 10
-
-# Save model checkpoint every checkpoint period epochs.
-_C.TRAIN.CHECKPOINT_PERIOD = 10
-
-# Resume training from the latest checkpoint in the output directory.
-_C.TRAIN.AUTO_RESUME = True
-
-# Path to the checkpoint to load the initial weight.
-_C.TRAIN.CHECKPOINT_FILE_PATH = ""
-
-# If True, reset epochs when loading checkpoint.
-_C.TRAIN.CHECKPOINT_EPOCH_RESET = False
-
-# If set, clear all layer names according to the pattern provided.
-_C.TRAIN.CHECKPOINT_CLEAR_NAME_PATTERN = ()  # ("backbone.",)
-
-# ---------------------------------------------------------------------------- #
 # Testing options
 # ---------------------------------------------------------------------------- #
 _C.TEST = CfgNode()
-
-# If True test the model, else skip the testing.
-_C.TEST.ENABLE = True
 
 # Dataset for testing.
 _C.TEST.DATASET = "epicsounds"
@@ -366,9 +331,7 @@ def _assert_and_infer_cfg(cfg):
     # BN assertions.
     if cfg.BN.USE_PRECISE_STATS:
         assert cfg.BN.NUM_BATCHES_PRECISE >= 0
-    # TRAIN assertions.
-    assert cfg.TRAIN.BATCH_SIZE % cfg.NUM_GPUS == 0
-
+        
     # TEST assertions.
     assert cfg.TEST.BATCH_SIZE % cfg.NUM_GPUS == 0
 

@@ -38,7 +38,6 @@ python tools/run_net.py \
   EPICKITCHENS.VISUAL_DATA_DIR /path/to/epic_frames \
   EPICKITCHENS.TEST_LIST /path/to/EPIC_100_feature_interval_times \
   TEST.BATCH_SIZE <batch_size> \
-  TEST.ENABLE True \
   TEST.NUM_FEATURES <num_features>
 ```
 
@@ -107,7 +106,6 @@ OUTPUT_DIR /path/to/output/dataset_split \
 PERCEPTION.VISUAL_DATA_DIR /path/to/perception_test_frames \
 PERCEPTION.TEST_LIST /path/to/PERCEPTION_feature_interval_times \
 TEST.BATCH_SIZE <batch_size> \
-TEST.ENABLE True \
 TEST.NUM_FEATURES <num_features>
 ```
 
@@ -173,7 +171,6 @@ OUTPUT_DIR /path/to/output/dataset_split \
 AVE.VISUAL_DATA_DIR /path/to/AVE_frames \
 AVE.TEST_LIST /path/to/AVE_feature_interval_times \
 TEST.BATCH_SIZE <batch_size> \
-TEST.ENABLE True \
 TEST.NUM_FEATURES <num_features>
 ```
 
