@@ -557,7 +557,7 @@ class InferenceMeter(object):
             self.best_mt_vis_acc1 = max(self.mt_action_acc[0], self.best_mt_vis_acc1)
         if is_best_audio:
             is_best = "audio_" + is_best if "visual" in is_best else "audio"
-            self.best_aud_acc1 = self.aud_acc[0]
+            self.best_aud_acc1 = max(self.aud_acc[0], self.best_aud_acc1)
 
         if self.early_stop_period > 0:
             stop = (epoch - self.last_best_epoch) > self.early_stop_period
