@@ -125,6 +125,9 @@ class TrainMeter(object):
         if audio_cls_num > 0 and "audio" in self.modality:
             self.audio_losses.update(audio_loss, audio_cls_num)
             self.audio_reg_losses.update(audio_reg_loss, audio_reg_num)
+            self.positive_losses.update(positive_loss, audio_reg_num)
+            self.negative_losses.update(negative_loss, (audio_cls_num - audio_reg_num))
+
 
         # Track overall loss and localization loss
         self.losses.update(loss, (visual_cls_num + audio_cls_num))
@@ -164,6 +167,8 @@ class TrainMeter(object):
             stats_dict.update(
                     {
                         "Train/audio_loss": self.audio_losses.avg,
+                        "Train/audio_positive_loss": self.positive_losses.avg,
+                        "Train/audio_negative_loss": self.negative_losses.avg,
                         "Train/audio_reg_loss": self.audio_reg_losses.avg,
                     }
                 )
@@ -190,17 +195,20 @@ class TrainMeter(object):
                             ' Label Loss: ({positive_loss.avg:.4f}, {negative_loss.avg:.4f}) |'
                             ' Visual Reg Loss: {visual_reg_loss.avg:.4f} |'.format(
                                     visual_loss=self.visual_losses,
-                                    visual_reg_loss=self.visual_reg_losses,
                                     positive_loss=self.positive_losses,
-                                    negative_loss=self.negative_losses
+                                    negative_loss=self.negative_losses,
+                                    visual_reg_loss=self.visual_reg_losses,
                                 )
                         )
         if "audio" in self.modality:
             message_str += (' Audio Views Seen: {audio_loss.count} |'
                             ' Audio Loss: {audio_loss.avg:.4f} |'
+                            ' Label Loss: ({positive_loss.avg:.4f}, {negative_loss.avg:.4f}) |'
                             ' Audio Reg Loss: {audio_reg_loss.avg:.4f} |'.format(
                                     audio_loss=self.audio_losses,
-                                    audio_reg_loss=self.audio_reg_losses
+                                    positive_loss=self.positive_losses,
+                                    negative_loss=self.negative_losses,
+                                    audio_reg_loss=self.audio_reg_losses,
                                 )
                         )
         if self.include_dr_loc:
@@ -311,16 +319,17 @@ class InferenceMeter(object):
         self.peak_gpu_mem = 0.0
         self.modality = args.data_modality
         self.include_verb_noun = args.include_verb_noun
+        self.num_classes = args.num_class
 
         # Initialize tensors.
         if self.include_verb_noun:
-            self.verb_preds = torch.empty((0, args.num_class[0][0]))
-            self.noun_preds = torch.empty((0, args.num_class[0][1]))
-            self.action_preds = torch.empty((0, args.num_class[0][2]))
+            self.verb_preds = torch.empty((0, self.num_classes[0][0]))
+            self.noun_preds = torch.empty((0, self.num_classes[0][1]))
+            self.action_preds = torch.empty((0, self.num_classes[0][2]))
         else:
-            self.action_preds = torch.empty((0, args.num_class[0]))
+            self.action_preds = torch.empty((0, self.num_classes[0]))
 
-        self.aud_preds = torch.empty((0, args.num_class[1]))
+        self.aud_preds = torch.empty((0, self.num_classes[1]))
 
         self.v_props = torch.empty((0, 2))
         self.a_props = torch.empty((0, 2))
@@ -335,13 +344,13 @@ class InferenceMeter(object):
         Reset the metric.
         """
         if self.include_verb_noun:
-            self.verb_preds = torch.empty((0, args.num_class[0][0]))
-            self.noun_preds = torch.empty((0, args.num_class[0][1]))
-            self.action_preds = torch.empty((0, args.num_class[0][2]))
+            self.verb_preds = torch.empty((0, self.num_classes[0][0]))
+            self.noun_preds = torch.empty((0, self.num_classes[0][1]))
+            self.action_preds = torch.empty((0, self.num_classes[0][2]))
         else:
-            self.action_preds = torch.empty((0, args.num_class[0]))
+            self.action_preds = torch.empty((0, self.num_classes[0]))
 
-        self.aud_preds = torch.empty((0, args.num_class[1]))
+        self.aud_preds = torch.empty((0, self.num_classes[1]))
 
         self.v_props = torch.empty((0, 2))
         self.a_props = torch.empty((0, 2))
