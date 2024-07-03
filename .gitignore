@@ -7,4 +7,6 @@ __pycache__/
 data
 recognition/precomputed_windows
 detection/precomputed_windows
+**/pretrained
 **/output
+**.out
