@@ -35,10 +35,9 @@ parser.add_argument(
     help = "Sigma for soft NMS"
 )
 parser.add_argument(
-    "--task",
-    type=str,
-    default='verb',
-    help="Task to be evaluated"
+    "--is_audio",
+    action='store_true',
+    help="Flag to signify that the model being evaluated is for audio"
 )
 parser.add_argument(
     "--n_jobs",
