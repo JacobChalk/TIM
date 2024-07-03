@@ -198,7 +198,7 @@ def train_epoch(
             if ("visual" in args.data_modality):
                     v_ious = ious[0]
                     valid_reg_indices = (offsets[0][:, 0] != float("inf"))
-                    valid_cls_indices = (v_ious > 0.0)
+                    valid_cls_indices = (v_ious >= 0.0)
                     num_pos = valid_reg_indices.sum()
                     visual_targets = labels[0]
                     v_ious = v_ious[valid_cls_indices]
@@ -270,7 +270,7 @@ def train_epoch(
             if ("audio" in args.data_modality):
                 a_ious = ious[1]
                 valid_reg_indices = (offsets[1][:, 0] != float("inf"))
-                valid_cls_indices = (a_ious > 0.0)
+                valid_cls_indices = (a_ious >= 0.0)
                 num_pos = valid_reg_indices.sum()
                 audio_targets = labels[1]
                 a_ious = a_ious[valid_cls_indices]
