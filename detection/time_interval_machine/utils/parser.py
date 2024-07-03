@@ -137,7 +137,7 @@ def parse_args():
                         choices=['visual', 'audio', 'audio_visual']
                     )
     parser.add_argument('--data_modality',
-                        default='visual' 
+                        default='visual', 
                         type=str, 
                         choices=['visual', 'audio', 'audio_visual']
                     )
