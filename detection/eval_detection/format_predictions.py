@@ -7,6 +7,7 @@ import os
 import argparse
 
 from joblib import Parallel, delayed
+from tqdm import tqdm
 
 from nms import batched_nms
 
@@ -101,32 +102,29 @@ def main(args):
     outs = torch.load(args.path_to_preds, map_location='cpu')
 
     print(f"Getting Scores and Predictions from {outs['video_ids'].shape[0]} proposals.")
-    results = {}
+    results = {v: [] for v in np.unique(outs['video_ids'])}
     init_count = 0
     multi_pred_size = 0
     multi_pred_count = 0
-    for i in range(outs['video_ids'].shape[0]):
+    
+    for i in tqdm(range(outs['video_ids'].shape[0])):
         vid = str(outs["video_ids"][i])
         proposal = outs['a_proposals'][i] if args.is_audio else outs['v_proposals'][i]
-        if ((round(proposal[1], 3) -  round(proposal[0], 3)) > 0.0):
+        proposal = np.round(proposal, 3)
+        if (proposal[1] -  proposal[0] > 0.0):
             scores = outs["audio"][i] if args.is_audio else outs['action'][i]
             valid_preds = np.where(scores > args.score_threshold)[0]
             if valid_preds.shape[0] > 0:
                 multi_pred_size += valid_preds.shape[0]
                 multi_pred_count += 1
 
-            for pred in valid_preds:
-                score = scores[pred]
-                entry = {
+                entries = [{
                     'action': pred,
-                    'score': score,
-                    'segment': [round(proposal[0], 3), round(proposal[1], 3)]
-                }
-                if vid in results:
-                    results[vid].append(entry)
-                else:
-                    results[vid] = [entry]
-                init_count += 1
+                    'score':  scores[pred],
+                    'segment': [proposal[0], proposal[1]]
+                } for pred in valid_preds]
+                results[vid].extend(entries)
+                init_count += len(entries)
 
     print(f"Creating Submission from {init_count} predictions. Average Multi-Pred: {round(multi_pred_size / multi_pred_count, 2)}")
 
@@ -141,7 +139,7 @@ def main(args):
             sigma=args.sigma,
             method=2,
             nms='soft',
-        ) for k, v in results.items())
+        ) for k, v in tqdm(results.items()))
 
     results = {t[1]: t[0] for t in results}
 
