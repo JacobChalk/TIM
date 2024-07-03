@@ -4,4 +4,8 @@ __pycache__/
 *$py.class
 
 *.sh
+data
 recognition/precomputed_windows
+detection/precomputed_windows
+recognition/output
+detection/output
