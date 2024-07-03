@@ -14,11 +14,6 @@ _C = CfgNode()
 # ---------------------------------------------------------------------------- #
 _C.TEST = CfgNode()
 
-# If True test the model, else skip the testing.
-#############
-# ✓✓✓✓✓✓✓✓✓ #
-#############
-_C.TEST.ENABLE = True
 
 # Dataset for testing.
 #############

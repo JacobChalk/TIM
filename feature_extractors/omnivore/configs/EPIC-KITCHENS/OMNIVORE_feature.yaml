@@ -13,7 +13,6 @@ MODEL:
   LOSS_FUNC: cross_entropy
   DROPOUT_RATE: 0.5
 TEST:
-  ENABLE: True
   DATASET: epickitchens
   BATCH_SIZE: 4
   NUM_SPATIAL_CROPS: 1

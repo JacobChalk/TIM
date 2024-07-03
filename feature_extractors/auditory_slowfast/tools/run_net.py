@@ -17,7 +17,6 @@ def main():
     cfg = load_config(args)
 
     # Perform multi-clip testing.
-    assert cfg.TEST.ENABLE == True
     launch_job(cfg=cfg, init_method=args.init_method, func=test)
 
 

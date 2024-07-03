@@ -52,8 +52,6 @@ NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 EPICSOUNDS.AUDIO_DATA_FILE /path/to/EPICSOUNDS_audio_files \
 EPICSOUNDS.TEST_LIST /path/to/EPICSOUNDS_feature_interval_times \
-TRAIN.ENABLE False \
-TEST.ENABLE True \
 TEST.CHECKPOINT_FILE_PATH /path/to/pretrained_auditory_slowfast \
 TEST.NUM_FEATURES <num_features>
 ```
@@ -131,8 +129,6 @@ NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 PERCEPTION.AUDIO_DATA_DIR /path/to/PERCEPTION_audio_files \
 PERCEPTION.TEST_LIST /path/to/PERCEPTION_feature_interval_times \
-TRAIN.ENABLE False \
-TEST.ENABLE True \
 TEST.CHECKPOINT_FILE_PATH /path/to/pretrained_auditory_slowfast \
 TEST.NUM_FEATURES <num_features>
 ```
@@ -207,8 +203,6 @@ NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 AVE.AUDIO_DATA_DIR /path/to/AVE_audio_files \
 AVE.TEST_LIST /path/to/AVE_feature_interval_times \
-TRAIN.ENABLE False \
-TEST.ENABLE True \
 TEST.CHECKPOINT_FILE_PATH /path/to/pretrained_auditory_slowfast \
 TEST.NUM_FEATURES <num_features>
 ```

@@ -125,8 +125,7 @@ def extract_features(cfg):
     features, metadata = perform_feature_extraction(test_loader, model, test_meter, cfg)
 
     if du.is_master_proc():
-        if cfg.TEST.DATASET == 'epickitchens' or cfg.TEST.DATASET == 'ave':
-            output_dir = os.path.join(cfg.OUTPUT_DIR, 'features')
-            os.makedirs(output_dir, exist_ok=True)
-            feature_file = os.path.join(output_dir, 'features.npy')
-            np.save(feature_file, features)
+        output_dir = os.path.join(cfg.OUTPUT_DIR, 'features')
+        os.makedirs(output_dir, exist_ok=True)
+        feature_file = os.path.join(output_dir, 'features.npy')
+        np.save(feature_file, features)
