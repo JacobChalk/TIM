@@ -46,7 +46,6 @@ def init_train(args):
     criterion = sigmoid_focal_loss
 
     training_iters = 0
-    val_iters = 0
     if args.pretrained_model != "":
         start_epoch, checkpoint = ch.load_checkpoint(args, model)
     else:
@@ -128,8 +127,7 @@ def init_train(args):
                         'warmup_scheduer': warmup_scheduler.state_dict(),
                         'train_meter': train_meter.state_dict(),
                         'scaler': scaler.state_dict(),
-                        'training_iters': training_iters,
-                        'val_iters': val_iters
+                        'training_iters': training_iters
                     }
                 )
     if is_master_proc:
@@ -200,7 +198,7 @@ def train_epoch(
             if ("visual" in args.data_modality):
                     v_ious = ious[0]
                     valid_reg_indices = (offsets[0][:, 0] != float("inf"))
-                    valid_cls_indices = (v_ious >= 0.0)
+                    valid_cls_indices = (v_ious > 0.0)
                     num_pos = valid_reg_indices.sum()
                     visual_targets = labels[0]
                     v_ious = v_ious[valid_cls_indices]
@@ -272,13 +270,13 @@ def train_epoch(
             if ("audio" in args.data_modality):
                 a_ious = ious[1]
                 valid_reg_indices = (offsets[1][:, 0] != float("inf"))
-                valid_cls_indices = (a_ious >= 0.0)
+                valid_cls_indices = (a_ious > 0.0)
                 num_pos = valid_reg_indices.sum()
                 audio_targets = labels[1]
                 a_ious = a_ious[valid_cls_indices]
                 a_ious.masked_fill_((a_ious < args.iou_threshold), 1.0)
 
-
+                normaliser = (0.9 * normaliser) + (0.1 * max(num_pos, 1))
                 audio_preds = output[0][3][valid_cls_indices]
                 audio_loss = get_loss(
                                         sigmoid_focal_loss,
@@ -311,7 +309,8 @@ def train_epoch(
                                             audio_reg,
                                             offsets[1][valid_reg_indices],
                                             reduction="sum"
-                                        ) / normaliser
+                                        ) * args.lambda_reg
+                    audio_reg_loss = audio_reg_loss / normaliser
 
                 audio_cls_num = valid_cls_indices.sum()
                 audio_reg_num = num_pos
