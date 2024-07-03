@@ -8,7 +8,7 @@ import time_interval_machine.utils.logging as logging
 import time_interval_machine.utils.distributed as du
 import time_interval_machine.utils.checkpoint as ch
 
-from time_interval_machine.utils.meters import InferenceMeter
+from time_interval_machine.utils.meters import FeatureMeter
 from time_interval_machine.models.build import build_model
 
 torch.set_printoptions(sci_mode=False)
@@ -54,7 +54,7 @@ def init_extract(args):
             mode = "test"
 
     feat_loader = loader.create_loader(args, mode, args.data_modality, rng_generator, get_gt_segments=False)
-    feat_meter = InferenceMeter(args=args)
+    feat_meter = FeatureMeter(args=args)
 
     logger.info(f"Extracting features for {len(feat_loader.dataset.windows)} windows.")
     extract_features(

@@ -12,7 +12,7 @@ from tqdm import tqdm
 from nms import batched_nms
 
 parser = argparse.ArgumentParser(
-    description="Evaluate Perception Test detection validation results",
+    description="Evaluate Perception Test/EPIC-Sounds validation proposals for detection",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )
 parser.add_argument(
@@ -145,7 +145,7 @@ def main(args):
 
     print("Total Entries:", sum([len(v) for k, v in results.items()]))
 
-    results = {k: sorted(v, key=lambda x: x['segment'][0]) for k, v in results.items()}
+    results = {k: sorted(v, key=lambda x: x['score'], reverse=True) for k, v in results.items()}
 
     output = {
             'video_id': [],

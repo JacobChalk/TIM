@@ -190,7 +190,7 @@ class TrainMeter(object):
                                     )
                     )
         if "visual" in self.modality:
-            message_str += (' Visual Views Seen: {visual_loss.count} |'
+            message_str += (' Visual Views Seen: {visual_loss.count} ({positive_loss.count}, {negative_loss.count}) |'
                             ' Visual Loss: {visual_loss.avg:.4f} |'
                             ' Label Loss: ({positive_loss.avg:.4f}, {negative_loss.avg:.4f}) |'
                             ' Visual Reg Loss: {visual_reg_loss.avg:.4f} |'.format(
@@ -201,7 +201,7 @@ class TrainMeter(object):
                                 )
                         )
         if "audio" in self.modality:
-            message_str += (' Audio Views Seen: {audio_loss.count} |'
+            message_str += (' Audio Views Seen: {audio_loss.count} ({positive_loss.count}, {negative_loss.count}) |'
                             ' Audio Loss: {audio_loss.avg:.4f} |'
                             ' Label Loss: ({positive_loss.avg:.4f}, {negative_loss.avg:.4f}) |'
                             ' Audio Reg Loss: {audio_reg_loss.avg:.4f} |'.format(
@@ -252,50 +252,56 @@ class TrainMeter(object):
             stats_dict.update(
                     {
                         "Train_Epoch/audio/loss": self.audio_losses.avg,
-                        "Train_Epoch/audio/reg_loss": self.audio_reg_losses.avg,
+                        "Train_Epoch/audio/positive_loss": self.positive_losses.avg,
+                        "Train_Epoch/audio/negative_loss": self.negative_losses.avg,
+                        "Train_Epoch/audio/reg_loss": self.audio_reg_losses.avg
                     }
                 )
 
         return stats_dict
 
     def get_train_epoch_message(self, epoch):
-        message_str = (f'\nEpoch {epoch} Results:\n' \
-                '\t==========================================\n')
+        message_str = (f'\nEpoch {epoch+1} Results:\n' \
+                '\t====================================================\n')
 
         if "visual" in self.modality:
             if self.include_verb_noun:
-                message_str += (f'\tVisual Views Seen: {self.visual_losses.count}\n' \
-                    '\t------------------------------------------\n' \
+                message_str += (f'\tVisual Views Seen: {self.visual_losses.count} ' \
+                    f'({self.positive_losses.count}, {self.negative_losses.count})\n' \
+                    '\t----------------------------------------------------\n' \
                     f'\tVisual Verb Loss {self.visual_verb_losses.avg:.3f}\n' \
-                    '\t------------------------------------------\n' \
+                    '\t----------------------------------------------------\n' \
                     f'\tVisual Noun Loss {self.visual_noun_losses.avg:.3f}\n' \
-                    '\t------------------------------------------\n' \
+                    '\t----------------------------------------------------\n' \
                     f'\tVisual Action Loss {self.visual_action_losses.avg:.3f}\n' \
-                    '\t------------------------------------------\n' \
+                    '\t----------------------------------------------------\n' \
                     f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
                     f'\tVisual Reg Loss {self.visual_reg_losses.avg:.5f}\n' \
-                    '\t==========================================\n')
+                    '\t====================================================\n')
             else:
-                message_str += (f'\tVisual Views Seen: {self.visual_losses.count}\n' \
-                    '\t------------------------------------------\n' \
+                message_str += (f'\tVisual Views Seen: {self.visual_losses.count} ' \
+                    f'({self.positive_losses.count}, {self.negative_losses.count})\n' \
+                    '\t----------------------------------------------------\n' \
                     f'\tVisual Action Loss {self.visual_action_losses.avg:.3f}\n' \
-                    '\t------------------------------------------\n' \
+                    '\t----------------------------------------------------\n' \
                     f'\tLabel Loss ({self.positive_losses.avg:.4f}, {self.negative_losses.avg:.4f})\n' \
                     f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
                     f'\tVisual Reg Loss {self.visual_reg_losses.avg:.5f}\n' \
-                    '\t==========================================\n')
+                    '\t====================================================\n')
         if "audio" in self.modality:
-            message_str += (f'\tAudio Views Seen: {self.audio_losses.count}\n' \
-                '\t------------------------------------------\n' \
+            message_str += (f'\tAudio Views Seen: {self.audio_losses.count} ' \
+                f'({self.positive_losses.count}, {self.negative_losses.count})\n' \
+                '\t----------------------------------------------------\n' \
+                f'\tLabel Loss ({self.positive_losses.avg:.4f}, {self.negative_losses.avg:.4f})\n' \
                 f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
                 f'\tAudio Reg Loss {self.audio_reg_losses.avg:.5f}\n' \
-                '\t==========================================\n')
+                '\t====================================================\n')
 
         if self.include_dr_loc:
             message_str += f'\tDR Loc Loss {self.drloc_losses.avg:.5f}\n'
 
         message_str += (f'\tLoss {self.losses.avg:.5f}\n' \
-                        '\t==========================================')
+                        '\t====================================================')
 
         return message_str
 
@@ -306,6 +312,260 @@ class TrainMeter(object):
         self.__dict__.update(state_dict)
 
 class InferenceMeter(object):
+    """Tracks multiple metrics for TIM model during validation"""
+    def __init__(self, args):
+        self.iter_timer = Timer()
+        self.data_timer = Timer()
+        self.net_timer = Timer()
+
+        self.losses = AverageMeter()
+        self.visual_action_losses = AverageMeter()
+        self.visual_reg_losses = AverageMeter()
+        self.visual_losses = AverageMeter()
+        self.positive_losses = AverageMeter()
+        self.negative_losses = AverageMeter()
+
+        self.audio_losses = AverageMeter()
+        self.audio_reg_losses = AverageMeter()
+
+        self.modality = args.data_modality
+        self.include_verb_noun = args.include_verb_noun
+
+        if self.include_verb_noun:
+            self.visual_verb_losses = AverageMeter()
+            self.visual_noun_losses = AverageMeter()
+
+        self.best_vis_loss = float("inf")
+        self.best_aud_loss = float("inf")
+        self.num_positives = 0
+        self.num_negatives = 0
+
+
+        self.reset()
+
+    def reset(self):
+        self.losses.reset()
+        self.visual_action_losses.reset()
+        self.visual_reg_losses.reset()
+        self.visual_losses.reset()
+        self.audio_losses.reset()
+
+        if self.include_verb_noun:
+            self.visual_verb_losses.reset()
+            self.visual_noun_losses.reset()
+
+    def iter_tic(self):
+        """
+        Start to record time.
+        """
+        self.iter_timer.reset()
+        self.data_timer.reset()
+
+    def iter_toc(self):
+        """
+        Stop to record time.
+        """
+        self.iter_timer.pause()
+
+    def data_toc(self):
+        self.data_timer.pause()
+        self.net_timer.reset()
+
+    def net_toc(self):
+        self.net_timer.pause()
+
+    def update(
+            self,
+            visual_loss,
+            visual_loss_verb,
+            visual_loss_noun,
+            visual_loss_action,
+            visual_reg_loss,
+            audio_loss,
+            audio_reg_loss,
+            loss,
+            positive_loss,
+            negative_loss,
+            visual_cls_num,
+            audio_cls_num,
+            visual_reg_num,
+            audio_reg_num
+        ):
+
+        # Track visual loss
+        if visual_cls_num > 0 and "visual" in self.modality:
+            self.visual_losses.update(visual_loss, visual_cls_num)
+
+            if self.include_verb_noun:
+                self.visual_verb_losses.update(visual_loss_verb, visual_cls_num)
+                self.visual_noun_losses.update(visual_loss_noun, visual_cls_num)
+
+            self.visual_action_losses.update(visual_loss_action, visual_cls_num)
+            self.visual_reg_losses.update(visual_reg_loss, visual_reg_num)
+            self.positive_losses.update(positive_loss, visual_reg_num)
+            self.negative_losses.update(negative_loss, (visual_cls_num - visual_reg_num))
+
+
+        # Track audio loss
+        if audio_cls_num > 0 and "audio" in self.modality:
+            self.audio_losses.update(audio_loss, audio_cls_num)
+            self.audio_reg_losses.update(audio_reg_loss, audio_reg_num)
+            self.positive_losses.update(positive_loss, audio_reg_num)
+            self.negative_losses.update(negative_loss, (audio_cls_num - audio_reg_num))
+
+        # Track overall loss and localization loss
+        self.losses.update(loss, (visual_cls_num + audio_cls_num))
+
+    def update_epoch(self, epoch):
+        is_best_visual = self.visual_losses.avg < self.best_vis_loss
+        is_best_audio = self.audio_losses.avg < self.best_aud_loss
+
+        best_loss = {
+                        "visual": self.best_vis_loss,
+                        "audio": self.best_aud_loss
+                    }
+
+        is_best = "none"
+        if is_best_visual:
+            is_best = "visual" if is_best_visual else ""
+            self.best_vis_loss = min(self.visual_losses.avg, self.best_vis_loss)
+            self.last_best_epoch = epoch
+        if is_best_audio:
+            is_best = "audio_" + is_best if "visual" in is_best else "audio"
+            self.best_aud_loss = min(self.audio_losses.avg, self.best_aud_loss)
+            self.last_best_epoch = epoch
+
+        return best_loss, is_best
+
+    def get_val_message(self, epoch, i, dataloader_size):
+        message_str = ('| Epoch: [{0}][{1}/{2}] |'
+                    ' Time: {batch_time:.3f} |'
+                    ' Data: {data_time:.3f} |'
+                    ' Net: {net_time:.3f} |'.format(
+                                        epoch+1,
+                                        i,
+                                        dataloader_size,
+                                        batch_time=self.iter_timer.seconds(),
+                                        data_time=self.data_timer.seconds(),
+                                        net_time=self.net_timer.seconds()
+                                    )
+                    )
+        if "visual" in self.modality:
+            message_str += (' Visual Views Seen: {visual_loss.count} ({positive_loss.count}, {negative_loss.count}) |'
+                            ' Visual Loss: {visual_loss.avg:.4f} |'
+                            ' Label Loss: ({positive_loss.avg:.4f}, {negative_loss.avg:.4f}) |'
+                            ' Visual Reg Loss: {visual_reg_loss.avg:.4f} |'.format(
+                                    visual_loss=self.visual_losses,
+                                    positive_loss=self.positive_losses,
+                                    negative_loss=self.negative_losses,
+                                    visual_reg_loss=self.visual_reg_losses,
+                                )
+                        )
+        if "audio" in self.modality:
+            message_str += (' Audio Views Seen: {audio_loss.count} ({positive_loss.count}, {negative_loss.count}) |'
+                            ' Audio Loss: {audio_loss.avg:.4f} |'
+                            ' Label Loss: ({positive_loss.avg:.4f}, {negative_loss.avg:.4f}) |'
+                            ' Audio Reg Loss: {audio_reg_loss.avg:.4f} |'.format(
+                                    audio_loss=self.audio_losses,
+                                    positive_loss=self.positive_losses,
+                                    negative_loss=self.negative_losses,
+                                    audio_reg_loss=self.audio_reg_losses,
+                                )
+                        )
+
+        message_str += (' Loss: {loss.avg:.4f} |'
+                        ' RAM: {ram[0]:.2f}/{ram[1]:.2f}GB |'
+                        ' GPU: {gpu[0]:.2f}/{gpu[1]:.2f}GB |'.format(
+                                                loss=self.losses,
+                                                ram=misc.cpu_mem_usage(),
+                                                gpu=misc.gpu_mem_usage()
+                                            )
+                        )
+        return message_str
+
+    def get_val_epoch_stats(self, iters):
+        stats_dict = {
+                    "val_step": iters
+                }
+
+        if "visual" in self.modality:
+            if self.include_verb_noun:
+                stats_dict.update(
+                    {
+                        "Val/visual/verb_loss": self.visual_verb_losses.avg,
+                        "Val/visual/noun_loss": self.visual_noun_losses.avg
+                    }
+                )
+            stats_dict.update(
+                    {
+                        "Val/visual/loss": self.visual_losses.avg,
+                        "Val/visual/action_loss": self.visual_action_losses.avg,
+                        "Val/visual/positive_loss": self.positive_losses.avg,
+                        "Val/visual/negative_loss": self.negative_losses.avg,
+                        "Val/visual/reg_loss": self.visual_reg_losses.avg,
+                    }
+                )
+        if "audio" in self.modality:
+            stats_dict.update(
+                    {
+                        "Val/audio/loss": self.audio_losses.avg,
+                        "Val/audio/positive_loss": self.positive_losses.avg,
+                        "Val/audio/negative_loss": self.negative_losses.avg,
+                        "Val/audio/reg_loss": self.audio_reg_losses.avg
+                    }
+                )
+
+        return stats_dict
+
+    def get_val_epoch_message(self, epoch):
+        message_str = (f'\nEpoch {epoch+1} Results:\n' \
+                '\t====================================================\n')
+
+        if "visual" in self.modality:
+            if self.include_verb_noun:
+                message_str += (f'\tVisual Views Seen: {self.visual_losses.count} ' \
+                    f'({self.positive_losses.count}, {self.negative_losses.count})\n' \
+                    '\t----------------------------------------------------\n' \
+                    f'\tVisual Verb Loss {self.visual_verb_losses.avg:.3f}\n' \
+                    '\t----------------------------------------------------\n' \
+                    f'\tVisual Noun Loss {self.visual_noun_losses.avg:.3f}\n' \
+                    '\t----------------------------------------------------\n' \
+                    f'\tVisual Action Loss {self.visual_action_losses.avg:.3f}\n' \
+                    '\t----------------------------------------------------\n' \
+                    f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
+                    f'\tVisual Reg Loss {self.visual_reg_losses.avg:.5f}\n' \
+                    '\t====================================================\n')
+            else:
+                message_str += (f'\tVisual Views Seen: {self.visual_losses.count} ' \
+                    f'({self.positive_losses.count}, {self.negative_losses.count})\n' \
+                    '\t----------------------------------------------------\n' \
+                    f'\tVisual Action Loss {self.visual_action_losses.avg:.3f}\n' \
+                    '\t----------------------------------------------------\n' \
+                    f'\tLabel Loss ({self.positive_losses.avg:.4f}, {self.negative_losses.avg:.4f})\n' \
+                    f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
+                    f'\tVisual Reg Loss {self.visual_reg_losses.avg:.5f}\n' \
+                    '\t====================================================\n')
+        if "audio" in self.modality:
+            message_str += (f'\tAudio Views Seen: {self.audio_losses.count} ' \
+                f'({self.positive_losses.count}, {self.negative_losses.count})\n' \
+                '\t----------------------------------------------------\n' \
+                f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
+                f'\tLabel Loss ({self.positive_losses.avg:.4f}, {self.negative_losses.avg:.4f})\n' \
+                f'\tAudio Reg Loss {self.audio_reg_losses.avg:.5f}\n' \
+                '\t====================================================\n')
+
+        message_str += (f'\tLoss {self.losses.avg:.5f}\n' \
+                        '\t====================================================')
+
+        return message_str
+
+    def state_dict(self):
+        return {key: value for key, value in self.__dict__.items()}
+
+    def load_state_dict(self, state_dict):
+        self.__dict__.update(state_dict)
+
+class FeatureMeter(object):
     """Tracks multiple metrics for TIM model during validation"""
     def __init__(
             self,

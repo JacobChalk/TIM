@@ -41,7 +41,7 @@ def load_checkpoint(args, model):
 
     return epoch, checkpoint
 
-def save_checkpoint(args, state):
+def save_checkpoint(args, state, is_best):
     weights_dir = args.output_dir / Path('models')
     if not weights_dir.exists():
         weights_dir.mkdir(parents=True)
@@ -49,3 +49,13 @@ def save_checkpoint(args, state):
     filename = f"checkpoint_{state['epoch']}.pth.tar"
     torch.save(state, weights_dir / filename)
     logger.info(f"Model Saved to Path: {weights_dir / filename}")
+    
+    if "visual" in is_best:
+        filename = "model_best_visual.pth.tar"
+        torch.save(state, weights_dir / filename)
+        logger.info(f"Model Saved to Path: {weights_dir / filename}")
+
+    if "audio" in is_best:
+        filename = "model_best_audio.pth.tar"
+        torch.save(state, weights_dir / filename)
+        logger.info(f"Model Saved to Path: {weights_dir / filename}")

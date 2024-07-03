@@ -94,7 +94,7 @@ def init_train(args):
 
     if args.enable_wandb_log and is_master_proc:
         wandb_log = True
-        wandb.init(project='time_prompting', config=args)
+        wandb.init(project='TIM', config=args, mode="offline")
         wandb.run.log_code(".")
         wandb.watch(model)
     else:

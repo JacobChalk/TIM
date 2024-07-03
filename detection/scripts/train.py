@@ -14,10 +14,11 @@ import time_interval_machine.utils.misc as misc
 
 from time_interval_machine.models.helpers.losses.sigmoid import sigmoid_focal_loss
 from time_interval_machine.models.helpers.losses.iou import ctr_diou_loss_1d
+from time_interval_machine.utils.meters import TrainMeter, InferenceMeter
 from time_interval_machine.models.helpers.losses.loss import get_loss
 from time_interval_machine.utils.checkpoint import save_checkpoint
 from time_interval_machine.models.build import build_model
-from time_interval_machine.utils.meters import TrainMeter
+from scripts.test import validate
 
 logger = logging.get_logger(__name__)
 
@@ -46,6 +47,7 @@ def init_train(args):
     criterion = sigmoid_focal_loss
 
     training_iters = 0
+    val_iters = 0
     if args.pretrained_model != "":
         start_epoch, checkpoint = ch.load_checkpoint(args, model)
     else:
@@ -53,8 +55,10 @@ def init_train(args):
         checkpoint = None
 
     train_loader = loader.create_loader(args, "train", args.data_modality, rng_generator)
+    val_loader = loader.create_loader(args, "val", args.data_modality, rng_generator)
 
     train_meter = TrainMeter(args)
+    val_meter = InferenceMeter(args)
 
     optimizer = torch.optim.AdamW(
                             model.parameters(),
@@ -79,8 +83,10 @@ def init_train(args):
         warmup_scheduler.load_state_dict(checkpoint['warmup_scheduer'])
         optimizer.load_state_dict(checkpoint["optimizer"])
         train_meter.load_state_dict(checkpoint["train_meter"])
+        val_meter.load_state_dict(checkpoint["val_meter"])
         scaler.load_state_dict(checkpoint["scaler"])
         training_iters = checkpoint["training_iters"]
+        val_iters = checkpoint["val_iters"]
 
     if args.enable_wandb_log and is_master_proc:
         wandb_log = True
@@ -114,6 +120,20 @@ def init_train(args):
                 iters=training_iters,
                 normaliser=normaliser
             )
+        
+        logger.info(f"Begin Audio-Visual Validation Epoch: [{epoch+1} / {args.finetune_epochs}]")
+        best_loss, is_best, val_iters = validate(
+                args=args,
+                val_loader=val_loader,
+                model=model,
+                criterion=criterion,
+                epoch=epoch,
+                is_master_proc=is_master_proc,
+                val_meter=val_meter,
+                wandb_log=False,
+                iters=val_iters,
+                normaliser=normaliser
+            )
         # Save checkpoint
         if is_master_proc:
             sd = model.module.state_dict() if args.num_gpus > 1 else model.state_dict()
@@ -122,13 +142,17 @@ def init_train(args):
                     {
                         'epoch': epoch + 1,
                         'state_dict': sd,
+                        'best_loss': best_loss,
                         'optimizer': optimizer.state_dict(),
                         'lr_scheduler': lr_scheduler.state_dict(),
                         'warmup_scheduer': warmup_scheduler.state_dict(),
                         'train_meter': train_meter.state_dict(),
+                        'val_meter': val_meter.state_dict(),
                         'scaler': scaler.state_dict(),
-                        'training_iters': training_iters
-                    }
+                        'training_iters': training_iters,
+                        'val_iters': val_iters
+                    },
+                    is_best
                 )
     if is_master_proc:
         wandb.finish()

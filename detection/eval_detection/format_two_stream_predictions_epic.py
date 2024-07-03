@@ -10,14 +10,17 @@ from tqdm import tqdm
 
 from nms import batched_nms
 
-
 parser = argparse.ArgumentParser(
-    description="Evaluate EPIC-KITCHENS-100 validation proposals for detection",
+    description="Evaluate EPIC-KITCHENS-100 validation proposals for detection from two stream model",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )
 parser.add_argument(
-    "path_to_preds",
-    help = "Path to the detection results from TIM"
+    "path_to_verb_preds",
+    help = "Path to the verb detection results from TIM"
+)
+parser.add_argument(
+    "path_to_noun_preds",
+    help = "Path to the noun detection results from TIM"
 )
 parser.add_argument(
     "path_to_gt",
@@ -30,16 +33,22 @@ parser.add_argument(
     help = "Preprocessing score threshold"
 )
 parser.add_argument(
+    "--verb_alpha",
+    type=float,
+    default=0.65,
+    help = "Alpha used to balance between verb and noun outputs"
+)
+parser.add_argument(
+    "--top_k",
+    type=int,
+    default=1,
+    help = "Top k verb/noun predictions to compare to"
+)
+parser.add_argument(
     "--sigma",
     type=float,
     default=0.25,
     help = "Sigma for soft NMS"
-)
-parser.add_argument(
-    "--task",
-    type=str,
-    default='verb',
-    help="Task to be evaluated"
 )
 parser.add_argument(
     "--n_jobs",
@@ -47,6 +56,7 @@ parser.add_argument(
     default=32,
     help="Number of parallel jobs to process detections"
 )
+
 
 def filter_nms(
             results_in_vid,
@@ -113,33 +123,55 @@ def filter_nms(
 
 def main(args):
     print("Loading Files")
-    outs = torch.load(args.path_to_preds, map_location='cpu')
+    verb_outs = torch.load(args.path_to_verb_preds, map_location='cpu')
+    noun_outs = torch.load(args.path_to_noun_preds, map_location='cpu')
 
-    print(f"Getting Scores and Predictions from {outs['video_ids'].shape[0]} proposals.")
-    results = {v: [] for v in np.unique(outs['video_ids'])}
+    outs = {
+            "video_ids": verb_outs["video_ids"],
+            "verb": verb_outs['action'],
+            "noun": noun_outs['action'],
+            "verb_proposals": verb_outs['v_proposals'],
+            "noun_proposals": noun_outs['v_proposals']
+        }
+
+    # print(f"Getting Scores and Predictions from {outs['video_ids'].shape[0]} proposals.")
+    results = {}
     init_count = 0
-    multi_pred_size = 0
-    multi_pred_count = 0
-
-    for i in tqdm(range(outs["action"].shape[0])):
+    top_k = args.top_k
+    for i in tqdm(range(outs["verb"].shape[0])):
         vid = str(outs["video_ids"][i])
-        proposal = np.round(outs['v_proposals'][i], 3)
-        if (proposal[1] -  proposal[0] > 0.0):
-            scores = outs["action"][i]
-            valid_preds = np.where(scores > args.score_threshold)[0]
-            if valid_preds.shape[0] > 0:
-                multi_pred_size += valid_preds.shape[0]
-                multi_pred_count += 1
+        top_k_verb_inds = np.argpartition(outs['verb'][i], -top_k)[-top_k:]
+        verb_scores = outs['verb'][i][top_k_verb_inds]
 
-                entries = [{
-                    'action': pred,
-                    'score':  scores[pred],
-                    'segment': [proposal[0], proposal[1]]
-                } for pred in valid_preds]
-                results[vid].extend(entries)
-                init_count += len(entries)
+        top_k_noun_inds = np.argpartition(outs['noun'][i], -top_k)[-top_k:]
+        noun_scores = outs['noun'][i][top_k_noun_inds]
 
-    print(f"Creating Submission from {init_count} predictions. Average Multi-Pred: {round(multi_pred_size / multi_pred_count, 2)}")
+        for v, verb_score in enumerate(verb_scores):
+            if verb_score > args.score_threshold:
+                for n, noun_score in enumerate(noun_scores):
+                    if noun_score > args.score_threshold:
+                        score = (verb_score**args.verb_alpha)*(noun_score**(1.0 - args.verb_alpha))
+                        if score > args.score_threshold:
+                            weight = verb_score / (verb_score + noun_score)
+                            proposal = (weight * outs['verb_proposals'][i]) + ((1 - weight) * (outs['noun_proposals'][i]))
+                            proposal = np.round(proposal, 3)
+                            if (proposal[1] -  proposal[0] > 0.0):
+                                    verb = top_k_verb_inds[v]
+                                    noun = top_k_noun_inds[n]
+                                    entry = {
+                                        'verb': verb,
+                                        'noun': noun,
+                                        'action': f"{verb},{noun}",
+                                        'score': score,
+                                        'segment': [proposal[0], proposal[1]]
+                                    }
+                                    if vid in results:
+                                        results[vid].append(entry)
+                                    else:
+                                        results[vid] = [entry]
+                                    init_count += 1
+
+    print((f'Creating Submission from {init_count} predictions.'))
 
     results = {k: v for k, v in sorted(results.items(), key=lambda item: len(item[1]))}
 
@@ -151,8 +183,7 @@ def main(args):
             min_score=0.001,
             sigma=args.sigma,
             method=2,
-            nms='soft',
-            filter=args.task
+            nms='soft'
         ) for k, v in tqdm(results.items()))
 
     results = {t[1]: t[0] for t in results}
@@ -160,27 +191,6 @@ def main(args):
     print("Total Entries:", sum([len(v) for k, v in results.items()]))
 
     results = {k: sorted(v, key=lambda x: x['score'], reverse=True) for k, v in results.items()}
-
-    output = {
-            'video_id': [],
-            'start': [],
-            'stop': [],
-            args.task: [],
-            'score': []
-        }
-
-    for k, v in results.items():
-        for i in range(len(v)):
-            output['video_id'].append(k)
-            output['start'].append(v[i]['segment'][0])
-            output['stop'].append(v[i]['segment'][1])
-            output[args.task].append(v[i][args.task])
-            output['score'].append(v[i]['score'])
-    out_df = pd.DataFrame.from_dict(output)
-    out_df = out_df.sort_values(['video_id', 'start'])
-    out_df = out_df.reset_index(drop=True)
-    print(out_df)
-
 
     submission = {
             "version": "0.2",
@@ -195,7 +205,4 @@ def main(args):
         json.dump(submission, f, indent=4, separators=(',', ': '))
 
     # Run the other script
-    subprocess.run(["python", "evaluate_detection_json_ek100.py", f"tim.json", args.path_to_gt, "--task", args.task])
-
-if __name__ == "__main__":
-    main(parser.parse_args())
+    subprocess.run(["python", "evaluate_detection_json_ek100.py", f"tim.json", args.path_to_gt])
