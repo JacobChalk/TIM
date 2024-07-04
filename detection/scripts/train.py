@@ -78,6 +78,7 @@ def init_train(args):
 
     scaler = torch.cuda.amp.GradScaler()
 
+    normaliser = args.normaliser
     if checkpoint is not None and start_epoch != 0:
         lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
         warmup_scheduler.load_state_dict(checkpoint['warmup_scheduer'])
@@ -85,6 +86,7 @@ def init_train(args):
         train_meter.load_state_dict(checkpoint["train_meter"])
         val_meter.load_state_dict(checkpoint["val_meter"])
         scaler.load_state_dict(checkpoint["scaler"])
+        normaliser = checkpoint["normaliser"]
         training_iters = checkpoint["training_iters"]
         val_iters = checkpoint["val_iters"]
 
@@ -96,8 +98,6 @@ def init_train(args):
     else:
         wandb_log = False
 
-
-    normaliser = args.normaliser
     for epoch in range(start_epoch, args.finetune_epochs):
         logger.info(f"Begin Audio-Visual Train Epoch: [{epoch+1} / {args.finetune_epochs}]")
 
@@ -130,7 +130,7 @@ def init_train(args):
                 epoch=epoch,
                 is_master_proc=is_master_proc,
                 val_meter=val_meter,
-                wandb_log=False,
+                wandb_log=wandb_log,
                 iters=val_iters,
                 normaliser=normaliser
             )
@@ -149,6 +149,7 @@ def init_train(args):
                         'train_meter': train_meter.state_dict(),
                         'val_meter': val_meter.state_dict(),
                         'scaler': scaler.state_dict(),
+                        'normaliser': normaliser,
                         'training_iters': training_iters,
                         'val_iters': val_iters
                     },
@@ -171,7 +172,7 @@ def train_epoch(
         is_master_proc,
         wandb_log=False,
         iters=0,
-        normaliser=250.0
+        normaliser=2000.0
     ):
 
     # Switch to train mode
@@ -442,7 +443,7 @@ def train_epoch(
                                             iters,
                                             normaliser,
                                             num_pos,
-                                            (visual_cls_num - num_pos)
+                                            (visual_cls_num - num_pos) if 'visual' in args.data_modality else (audio_cls_num - num_pos)
                                         )
                 wandb.log(log_dict)
             logger.info(message)

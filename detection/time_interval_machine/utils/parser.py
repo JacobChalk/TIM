@@ -111,9 +111,9 @@ def parse_args():
                         help='Degree of label smoothing'
                     )
     parser.add_argument('--normaliser',
-                        default=250.0,
+                        default=2000.0,
                         type=float,
-                        help='Degree of label smoothing'
+                        help='Normaliser for Sigmoid loss'
                     )
     parser.add_argument('--enable_amp', type=str2bool, default=True)
     parser.add_argument('--early_stop_period', type=int, default=100)
