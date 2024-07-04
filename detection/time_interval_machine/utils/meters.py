@@ -67,6 +67,9 @@ class TrainMeter(object):
             self.visual_verb_losses.reset()
             self.visual_noun_losses.reset()
 
+        self.positive_losses.reset()
+        self.negative_losses.reset()
+
 
     def iter_tic(self):
         """
@@ -353,6 +356,9 @@ class InferenceMeter(object):
         if self.include_verb_noun:
             self.visual_verb_losses.reset()
             self.visual_noun_losses.reset()
+            
+        self.positive_losses.reset()
+        self.negative_losses.reset()
 
     def iter_tic(self):
         """
