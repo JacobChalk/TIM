@@ -1,0 +1,14 @@
+einops==0.7.0
+fvcore==0.1.5.post20221221
+h5py==3.9.0
+iopath==0.1.10
+librosa==0.10.1
+matplotlib==3.8.3
+numpy==1.26.4
+pandas==2.2.1
+Pillow==10.2.0
+simplejson==3.19.2
+timm==0.9.16
+torch==2.2.1
+torchvision==0.17.1
+tqdm==4.66.2
