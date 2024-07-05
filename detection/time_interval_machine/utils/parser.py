@@ -111,7 +111,7 @@ def parse_args():
                         help='Degree of label smoothing'
                     )
     parser.add_argument('--normaliser',
-                        default=2000.0,
+                        default=250.0,
                         type=float,
                         help='Normaliser for Sigmoid loss'
                     )
