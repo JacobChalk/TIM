@@ -41,11 +41,8 @@ class Perception(torch.utils.data.Dataset):
         for tup in pd.read_pickle(path_annotations_pickle).iterrows():
             for idx in range(self._num_clips):
                 record = PerceptionAudioRecord(tup, sr=self.cfg.AUDIO_DATA.SAMPLING_RATE)
-                if record.untrimmed_video_name == 'video_3848':
-                    self._audio_records.append(record)
-                    self._temporal_idx.append(idx)
-                # self._audio_records.append(record)
-                # self._temporal_idx.append(idx)
+                self._audio_records.append(record)
+                self._temporal_idx.append(idx)
 
         assert (
                 len(self._audio_records) > 0
