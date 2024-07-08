@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import argparse
 
-parser = argparse.ArgumentParser(description=('Create .npy files for the Perception Test dataset'))
+parser = argparse.ArgumentParser(description=('Create .npy files for the AVE dataset'))
 
 ###### Things you need to modify ######
 parser.add_argument('--feature_list', type=str, help='Path to extracted features')
