@@ -115,6 +115,11 @@ def parse_args():
                         type=float,
                         help='Normaliser for Sigmoid loss'
                     )
+    parser.add_argument('--normaliser_momentum',
+                        default=0.9,
+                        type=float,
+                        help='Mometum factor for loss normaliser'
+                    )
     parser.add_argument('--enable_amp', type=str2bool, default=True)
     parser.add_argument('--early_stop_period', type=int, default=100)
     # ------------------------------ Optimizer ------------------------------

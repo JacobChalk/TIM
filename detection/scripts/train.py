@@ -172,7 +172,7 @@ def train_epoch(
         is_master_proc,
         wandb_log=False,
         iters=0,
-        normaliser=2000.0
+        normaliser=250.0
     ):
 
     # Switch to train mode
@@ -229,7 +229,7 @@ def train_epoch(
                     v_ious = v_ious[valid_cls_indices]
                     v_ious.masked_fill_((v_ious < args.iou_threshold), 1.0)
 
-                    normaliser = (0.9 * normaliser) + (0.1 * max(num_pos, 1))
+                    normaliser = (args.normaliser_momentum * normaliser) + ((1.0 - args.normaliser_momentum) * max(num_pos, 1))
                     if args.include_verb_noun:
                         verb_preds = output[0][0][valid_cls_indices]
                         noun_preds = output[0][1][valid_cls_indices]
@@ -301,7 +301,7 @@ def train_epoch(
                 a_ious = a_ious[valid_cls_indices]
                 a_ious.masked_fill_((a_ious < args.iou_threshold), 1.0)
 
-                normaliser = (0.9 * normaliser) + (0.1 * max(num_pos, 1))
+                normaliser = (args.normaliser_momentum * normaliser) + ((1.0 - args.normaliser_momentum) * max(num_pos, 1))
                 audio_preds = output[0][3][valid_cls_indices]
                 audio_loss = get_loss(
                                         sigmoid_focal_loss,
