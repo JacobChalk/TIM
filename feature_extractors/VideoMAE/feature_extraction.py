@@ -67,7 +67,7 @@ def get_args():
 
     args = parser.parse_args()
 
-    args.num_aug = min(args.num_aug, 1)
+    args.num_aug = max(args.num_aug, 1)
 
     if args.dataset == "ek100":
         args.num_classes = [97, 300]
