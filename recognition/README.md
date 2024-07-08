@@ -142,7 +142,7 @@ python scripts/run_net.py \
 --d_model 256 \
 --apply_feature_pooling False \
 --lr 5e-4 \
---lambda_audio 1 \
+--lambda_audio 1.0 \
 --lambda_drloc 0.1 \
 --mixup_alpha 0.5 \
 --include_verb_noun False
