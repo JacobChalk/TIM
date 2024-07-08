@@ -59,6 +59,7 @@ def main(args):
         videomae_features = os.listdir(f"{args.videomae_feature_path}/{split}")
 
         assert len(omnivore_features) == len(videomae_features), f"Mismatch in number of features. Omnivore: {len(omnivore_features)} != VideoMAE: {len(videomae_features)}"
+        assert omnivore_features.shape[1] == videomae_features.shape[1], f"Mismatch in number of feature sets. Omnivore: {omnivore_features.shape[1]} != VideoMAE: {videomae_features.shape[1]}"
 
         if not os.path.exists(f"{args.output_path}/{split}"):
             os.makedirs(f"{args.output_path}/{split}", exist_ok=True)
