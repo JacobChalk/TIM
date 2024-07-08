@@ -46,7 +46,7 @@ python scripts/run_net.py \
 --audio_val_context_pickle /path/to/epic_sounds_validation_audio_feature_intervals \
 --audio_input_dim <channel-size-of-audio-features> \
 --video_info_pickle /path/to/epic_kitchens_video_metadata \
---lambda_audio 0.01
+--lambda_audio 0.1
 ```
 
 **NOTE:** Either dataset can be trained individually by changing the `data_modality` flag to either `audio` or `visual`. To use only audio or visual features change the `model_modality` flag to `audio` or `visual`.
