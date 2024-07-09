@@ -153,68 +153,8 @@ class TIM(nn.Module):
 
         queries = torch.concat(queries, dim=0).unsqueeze(0)
         return queries
-
-    def label_queries(self, queries, target, modality, iou_threshold):
-        """Label queries that have maximum IOU with ground truth
-            segments within the window.
-
-        Args:
-            queries (torch.Tensor): Contains the time interval queries for the
-            given modality
-            target (dict): Contains labels of all the ground truth segments
-            within the input window
-            modality (str): The modality to get queries from
-            iou_threshold (float, optional): IOU threshold with ground truth
-            segments to determine valid proposals. Defaults to 0.3.
-
-        Returns:
-            query_targets (torch.Tensor[B*Nq, 2]): The intervals of the ground
-            truth segment the query is trying to regress to
-            query_labels (torch.Tensor[B*Nq, Nl]): The labels of the ground
-            truth segemnts the query overlaps with. Nl=Number of labels for the
-            given modality (3 if including verb/noun in visual, 1 otherwise)
-            query_ious (torch.Tensor[B*Nq]): The IOUs with the ground truth
-            segment the query is assigned to. Used to reweight CLS loss
-        """
-        if modality == "visual":
-            target_segs = target['v_gt_segments']
-            gt_labels = torch.stack([target['verb'], target['noun'], target['action']], dim=-1)
-        else:
-            target_segs = target['a_gt_segments']
-            gt_labels = target['class_id'].unsqueeze(-1)
-
-        queries = queries[:, :, None].repeat_interleave(target_segs.shape[1], dim=2)
-        target_segs = target_segs[:, None].repeat_interleave(queries.shape[1], dim=1)
-        query_labels = gt_labels[:, None].repeat_interleave(queries.shape[1], dim=1)
-
-        query_starts, query_ends = queries[:, :, :, 0], queries[:, :, :, 1]
-        gt_starts, gt_ends = target_segs[:, :, :, 0], target_segs[:, :, :, 1]
-
-        intersect_starts = torch.stack([query_starts, gt_starts], dim=-1).max(dim=-1)[0]        # [B, N_f, N_a]
-        intersect_ends = torch.stack([query_ends, gt_ends], dim=-1).min(dim=-1)[0]              # [B, N_f, N_a]
-        intersects = torch.clamp(intersect_ends - intersect_starts, min=0.0)
-
-        unions = (gt_ends - gt_starts) + (query_ends - query_starts) - intersects
-        ious = intersects / unions
-
-        max_iou_inds = ious.argmax(-1).flatten()
-        batch_inds = torch.arange(ious.shape[0]).repeat_interleave(ious.shape[1])
-        feat_inds = torch.arange(ious.shape[1]).repeat(ious.shape[0])
-
-        ious = ious[batch_inds, feat_inds, max_iou_inds].reshape(ious.shape[0], -1)
-        query_targets = target_segs[batch_inds, feat_inds, max_iou_inds].reshape(ious.shape[0], -1, 2)
-        query_labels = query_labels[batch_inds, feat_inds, max_iou_inds].reshape(ious.shape[0], -1, query_labels.shape[-1])
-
-        # Fill negative proposals with dummy information
-        negatives = (ious < iou_threshold)
-        query_targets.masked_fill_(negatives[:, :, None], float("inf"))
-        query_labels.masked_fill_(negatives[:, :, None], -1)
-
-        # Flatten all queries in each pyramid level
-        query_targets = torch.flatten(query_targets, start_dim=0, end_dim=1)
-        query_labels = torch.flatten(query_labels, start_dim=0, end_dim=1)
-        query_ious = torch.flatten(ious)
-
+    
+    def assign_positive_labels(self, modality, query_labels):
         if modality == "visual":
             verb_labels = torch.empty(size=(0,)).to(device=query_labels.device)
             noun_labels = torch.empty(size=(0,)).to(device=query_labels.device)
@@ -240,6 +180,92 @@ class TIM(nn.Module):
             num_actions = self.num_class[1]
             query_labels.masked_fill_(query_labels==-1, num_actions)
             query_labels = ((F.one_hot(query_labels[:, -1], num_actions+1) * self.label_smoothing) + ((1 - self.label_smoothing) / (num_actions+1)))[:, :-1]
+        
+        return query_labels
+
+    def get_query_ious(self, queries, target_segs):
+        """Calculates all ious between queries and target segs
+
+        Args:
+            queries (torch.Tensor): Contains the time interval queries for the
+            given modality
+            target_segs (torch.Tensor): Contains the time interval of targets 
+            for the given modality
+        Returns:
+            ious (torch.Tensor[B, N_q*N_a]): The IOUs between all queries and
+            all targets
+        """
+        query_starts, query_ends = queries[:, :, :, 0], queries[:, :, :, 1]
+        gt_starts, gt_ends = target_segs[:, :, :, 0], target_segs[:, :, :, 1]
+        negative_offsets = torch.abs(torch.clamp(gt_starts.min(dim=-1)[0], max=0.0))
+
+        query_starts += negative_offsets[:, :, None]
+        query_ends += negative_offsets[:, :, None]
+        gt_starts += negative_offsets[:, :, None]
+        gt_ends += negative_offsets[:, :, None]
+
+        intersect_starts = torch.stack([query_starts, gt_starts], dim=-1).max(dim=-1)[0]        # [B, N_f, N_a]
+        intersect_ends = torch.stack([query_ends, gt_ends], dim=-1).min(dim=-1)[0]              # [B, N_f, N_a]
+        intersects = torch.clamp(intersect_ends - intersect_starts, min=0.0)
+
+        unions = (gt_ends - gt_starts) + (query_ends - query_starts) - intersects
+        return intersects / unions  
+    
+    def label_queries(self, queries, target, modality, iou_threshold):
+        """Label queries that have maximum IOU with ground truth
+            segments within the window.
+
+        Args:
+            queries (torch.Tensor): Contains the time interval queries for the
+            given modality
+            target (dict): Contains labels of all the ground truth segments
+            within the input window
+            modality (str): The modality to get queries from
+            iou_threshold (float, optional): IOU threshold with ground truth
+            segments to determine valid proposals.
+
+        Returns:
+            query_targets (torch.Tensor[B*Nq, 2]): The intervals of the ground
+            truth segment the query is trying to regress to
+            query_labels (torch.Tensor[B*Nq, Nl]): The labels of the ground
+            truth segemnts the query overlaps with. Nl=Number of labels for the
+            given modality (3 if including verb/noun in visual, 1 otherwise)
+            query_ious (torch.Tensor[B*Nq]): The IOUs with the ground truth
+            segment the query is assigned to. Used to reweight CLS loss
+        """
+        if modality == "visual":
+            target_segs = target['v_gt_segments']
+            gt_labels = torch.stack([target['verb'], target['noun'], target['action']], dim=-1)
+        else:
+            target_segs = target['a_gt_segments']
+            gt_labels = target['class_id'].unsqueeze(-1)
+
+        # Format queries, targets and labels to calcuate ious
+        queries = queries[:, :, None].repeat_interleave(target_segs.shape[1], dim=2)
+        target_segs = target_segs[:, None].repeat_interleave(queries.shape[1], dim=1)
+        query_labels = gt_labels[:, None].repeat_interleave(queries.shape[1], dim=1)
+
+        ious = self.get_query_ious(queries, target_segs)
+
+        max_iou_inds = ious.argmax(-1).flatten()
+        batch_inds = torch.arange(ious.shape[0]).repeat_interleave(ious.shape[1])
+        feat_inds = torch.arange(ious.shape[1]).repeat(ious.shape[0])
+
+        ious = ious[batch_inds, feat_inds, max_iou_inds].reshape(ious.shape[0], -1)
+        query_targets = target_segs[batch_inds, feat_inds, max_iou_inds].reshape(ious.shape[0], -1, 2)
+        query_labels = query_labels[batch_inds, feat_inds, max_iou_inds].reshape(ious.shape[0], -1, query_labels.shape[-1])
+
+        # Fill negative proposals with dummy information
+        negatives = (ious < iou_threshold)
+        query_targets.masked_fill_(negatives[:, :, None], float("inf"))
+        query_labels.masked_fill_(negatives[:, :, None], -1)
+
+        # Flatten all queries in each pyramid level
+        query_targets = torch.flatten(query_targets, start_dim=0, end_dim=1)
+        query_labels = torch.flatten(query_labels, start_dim=0, end_dim=1)
+        query_ious = torch.flatten(ious)
+
+        query_labels = self.assign_positive_labels(modality, query_labels)        
 
         return query_targets, query_labels, query_ious
 

@@ -10,12 +10,14 @@ parser = argparse.ArgumentParser(description=('Extract frames for the Perception
 parser.add_argument('video_dir', type=str, help='Path to .MP4 videos')
 parser.add_argument('out_dir', type=str, help='Path to save extracted frames')
 
-def ffmpeg_extraction(videofile, out_dir):
+def ffmpeg_extraction(videofile):
     basename = os.path.basename(videofile)[:-4]
-    out_dir = os.path.join(out_dir, basename)
-    os.makedirs(out_dir, exist_ok=True)
 
-    command = f"ffmpeg -i {videofile} '{out_dir}/frame_%10d.jpg'"
+    # Change this to store the frames
+    outdir = f'{args.out_dir}/{basename}'
+    os.makedirs(outdir, exist_ok=True)
+
+    command = f"ffmpeg -i {videofile} '{outdir}/frame_%10d.jpg'"
     subprocess.call(command, shell=True)
 
     time.sleep(1)
@@ -23,7 +25,8 @@ def ffmpeg_extraction(videofile, out_dir):
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    mp4files = glob.glob(os.path.join(args.video_dir, '*.mp4'))
+    # Change the path to your own dataset path
+    mp4files = glob.glob(f'{args.video_dir}*.mp4')
 
     with multiprocessing.Pool(40) as p:
-        p.map(ffmpeg_extraction, zip(mp4files, repeat(args.out_dir)))
+        p.map(ffmpeg_extraction, mp4files)

@@ -328,11 +328,20 @@ class SlidingWindowDataset(data.Dataset):
             v_label_name = str(v_labels_pkl).split('/')[-1].replace('.pkl', '')
             windows_path += f"{v_label_name}_"
 
+            # AVE has same label set, so need to distinguish to avoid errors
+            if self.dataset_name == 'ave':
+                windows_path += f"visual_" 
+
         if "audio" in self.data_modality:
             if self.dataset_name not in str(a_labels_pkl).lower() and self.data_modality != "audio_visual":
                 windows_path += f"{self.dataset_name.upper()}"
+                
             a_labels_name = str(a_labels_pkl).split('/')[-1].replace('.pkl', '')
             windows_path += f"{a_labels_name}_"
+
+            if self.dataset_name == 'ave':
+                windows_path += f"audio_" 
+
         hop_secs = round(self.feat_stride * self.feat_gap, 3)
         windows_path += f"win_{self.num_feats}_{hop_secs}_{self.window_size}_{self.window_stride}.pth"
         return windows_path

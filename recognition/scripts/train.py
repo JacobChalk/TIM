@@ -390,14 +390,14 @@ def train_epoch(
 
         # Track losses
         train_meter.update(
-            # verb_preds.detach().cpu(),
-            # noun_preds.detach().cpu(),
-            # action_preds.detach().cpu(),
-            # audio_preds.detach().cpu(),
-            # v_action_ids.detach().cpu(),
-            # a_action_ids.detach().cpu(),
-            # visual_target.detach().cpu(),
-            # audio_target.detach().cpu(),
+            verb_preds.detach().cpu(),
+            noun_preds.detach().cpu(),
+            action_preds.detach().cpu(),
+            audio_preds.detach().cpu(),
+            v_action_ids.detach().cpu(),
+            a_action_ids.detach().cpu(),
+            visual_target.detach().cpu(),
+            audio_target.detach().cpu(),
             visual_loss.item(),
             visual_loss_verb.item(),
             visual_loss_noun.item(),
@@ -430,9 +430,9 @@ def train_epoch(
 
         train_meter.iter_tic()
 
-    # train_meter.update_epoch()
+    train_meter.update_epoch()
 
-    # Log validation epoch stats
+    # Log train epoch stats
     if wandb_log and is_master_proc:
         iters += 1
         log_dict = train_meter.get_train_epoch_stats(iters)

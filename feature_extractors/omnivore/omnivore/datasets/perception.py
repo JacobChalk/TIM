@@ -125,7 +125,11 @@ class Perception(torch.utils.data.Dataset):
             frames = torch.stack(frames)
 
         # For omnivore style frame transform
-        scale = min_scale/frames.shape[1]
+        if frames.shape[1] < frames.shape[2]:
+            scale = min_scale / frames.shape[1]
+        else:
+            scale = min_scale / frames.shape[2]
+            
         frames = [
                 cv2.resize(
                     img_array.numpy(),

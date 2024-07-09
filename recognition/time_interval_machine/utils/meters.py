@@ -43,6 +43,7 @@ class TrainMeter(object):
 
         self.audio_losses = AverageMeter()
 
+        self.dataset = args.dataset
         self.modality = args.data_modality
         self.include_dr_loc = args.lambda_drloc > 0.0
         self.include_verb_noun = args.include_verb_noun
@@ -66,6 +67,7 @@ class TrainMeter(object):
         self.action_acc = (0.0, 0.0)
         self.mt_action_acc = (0.0, 0.0)
         self.aud_acc = (0.0, 0.0)
+        self.combined_acc = (0.0, 0.0)
 
         self.reset()
 
@@ -91,6 +93,8 @@ class TrainMeter(object):
 
         self.action_acc = (0.0, 0.0)
         self.aud_acc = (0.0, 0.0)
+        self.combined_acc = (0.0, 0.0)
+
 
     def iter_tic(self):
         """
@@ -114,14 +118,14 @@ class TrainMeter(object):
 
     def update(
             self,
-            # verb_preds,
-            # noun_preds,
-            # action_preds,
-            # aud_preds,
-            # v_action_ids,
-            # a_action_ids,
-            # v_labels,
-            # a_labels,
+            verb_preds,
+            noun_preds,
+            action_preds,
+            aud_preds,
+            v_action_ids,
+            a_action_ids,
+            v_labels,
+            a_labels,
             visual_loss,
             visual_loss_verb,
             visual_loss_noun,
@@ -140,23 +144,23 @@ class TrainMeter(object):
             if self.include_verb_noun:
                 self.visual_verb_losses.update(visual_loss_verb, valid_visual)
                 self.visual_noun_losses.update(visual_loss_noun, valid_visual)
-                # self.verb_preds.index_add_(dim=0, index=v_action_ids, source=verb_preds)
-                # self.noun_preds.index_add_(dim=0, index=v_action_ids, source=noun_preds)
+                self.verb_preds.index_add_(dim=0, index=v_action_ids, source=verb_preds)
+                self.noun_preds.index_add_(dim=0, index=v_action_ids, source=noun_preds)
 
             self.visual_action_losses.update(visual_loss_action, valid_visual)
-            # self.action_preds.index_add_(dim=0, index=v_action_ids, source=action_preds)
-            # self.seen_count.index_add_(dim=0, index=v_action_ids, source=torch.ones_like(v_action_ids).float())
+            self.action_preds.index_add_(dim=0, index=v_action_ids, source=action_preds)
+            self.seen_count.index_add_(dim=0, index=v_action_ids, source=torch.ones_like(v_action_ids).float())
 
-            # self.v_labels[v_action_ids] = v_labels.int()
+            self.v_labels[v_action_ids] = v_labels.int()
 
         # Track audio loss
         if valid_audio > 0 and "audio" in self.modality:
             self.audio_losses.update(audio_loss, valid_audio)
 
-            # self.aud_preds.index_add_(0, a_action_ids, aud_preds)
-            # self.seen_count.index_add_(0, a_action_ids, torch.ones_like(a_action_ids).float())
+            self.aud_preds.index_add_(dim=0, index=a_action_ids, source=aud_preds)
+            self.seen_count.index_add_(dim=0, index=a_action_ids, source=torch.ones_like(a_action_ids).float())
 
-            # self.a_labels[a_action_ids] = a_labels.int()
+            self.a_labels[a_action_ids] = a_labels.int()
 
         # Track overall loss and localization loss
         self.losses.update(loss, (valid_visual + valid_audio))
@@ -175,30 +179,30 @@ class TrainMeter(object):
             if self.include_verb_noun:
                 stats_dict.update(
                     {
-                        # "Train/visual/verb_Top1_acc": self.verb_acc[0],
-                        # "Train/visual/verb_Top5_acc": self.verb_acc[1],
-                        # "Train/visual/noun_Top1_acc": self.noun_acc[0],
-                        # "Train/visual/noun_Top5_acc": self.noun_acc[1],
+                        "Train/visual/verb_Top1_acc": self.verb_acc[0],
+                        "Train/visual/verb_Top5_acc": self.verb_acc[1],
+                        "Train/visual/noun_Top1_acc": self.noun_acc[0],
+                        "Train/visual/noun_Top5_acc": self.noun_acc[1],
                         "Train/verb/visual_loss": self.visual_verb_losses.avg,
                         "Train/noun/visual_loss": self.visual_noun_losses.avg,
-                        # "Train/visual/Top1_acc": self.mt_action_acc[0],
-                        # "Train/visual/Top5_acc": self.mt_action_acc[1],
+                        "Train/visual/Top1_acc": self.mt_action_acc[0],
+                        "Train/visual/Top5_acc": self.mt_action_acc[1],
                     }
                 )
             stats_dict.update(
                     {
                         "Train/visual_loss": self.visual_losses.avg,
                         "Train/visual_action_loss": self.visual_action_losses.avg,
-                        # "Train/visual/act_Top1_acc": self.action_acc[0],
-                        # "Train/visual/act_Top5_acc": self.action_acc[1]
+                        "Train/visual/act_Top1_acc": self.action_acc[0],
+                        "Train/visual/act_Top5_acc": self.action_acc[1]
                     }
                 )
         if "audio" in self.modality:
             stats_dict.update(
                     {
                         "Train/audio_loss": self.audio_losses.avg,
-                        # "Train/audio/Top1_acc": self.aud_acc[0],
-                        # "Train/audio/Top5_acc": self.aud_acc[1],
+                        "Train/audio/Top1_acc": self.aud_acc[0],
+                        "Train/audio/Top5_acc": self.aud_acc[1],
                     }
                 )
 
@@ -248,7 +252,7 @@ class TrainMeter(object):
 
     def update_epoch(self):
         if "visual" in self.modality:
-            valid_indices = (self.v_labels[:, 2] != -1).sum()
+            valid_indices = (self.v_labels[:, 2] != -1)
             seen = self.seen_count[valid_indices].unsqueeze(1)
 
             if self.include_verb_noun:
@@ -268,13 +272,17 @@ class TrainMeter(object):
             self.action_acc = accuracy(action_preds.float(), action_labels)
 
         if "audio" in self.modality:
-            valid_indices = (self.a_labels != -1).sum()
+            valid_indices = (self.a_labels != -1)
             seen = self.seen_count[valid_indices].unsqueeze(1)
 
             aud_preds = (self.aud_preds[valid_indices].float() / seen.repeat(1, self.aud_preds.size(1))).softmax(dim=1)
             aud_labels = self.a_labels[valid_indices]
 
             self.aud_acc = accuracy(aud_preds.float(), aud_labels)
+
+        if self.dataset == 'ave' and self.modality == 'audio_visual':
+            combined_preds = (action_preds + aud_preds) / 2.0
+            self.combined_acc = accuracy(combined_preds.float(), action_labels)
 
     def get_train_epoch_stats(self, iters):
         stats_dict = {
@@ -287,28 +295,36 @@ class TrainMeter(object):
                     {
                         "Train_Epoch/visual/verb_loss": self.visual_verb_losses.avg,
                         "Train_Epoch/visual/noun_loss": self.visual_noun_losses.avg,
-                        # "Train_Epoch/visual/verb_Top1_acc": self.verb_acc[0],
-                        # "Train_Epoch/visual/verb_Top5_acc": self.verb_acc[1],
-                        # "Train_Epoch/visual/noun_Top1_acc": self.noun_acc[0],
-                        # "Train_Epoch/visual/noun_Top5_acc": self.noun_acc[1],
-                        # "Train_Epoch/visual/Top1_acc": self.mt_action_acc[0],
-                        # "Train_Epoch/visual/Top5_acc": self.mt_action_acc[1]
+                        "Train_Epoch/visual/verb_Top1_acc": self.verb_acc[0],
+                        "Train_Epoch/visual/verb_Top5_acc": self.verb_acc[1],
+                        "Train_Epoch/visual/noun_Top1_acc": self.noun_acc[0],
+                        "Train_Epoch/visual/noun_Top5_acc": self.noun_acc[1],
+                        "Train_Epoch/visual/Top1_acc": self.mt_action_acc[0],
+                        "Train_Epoch/visual/Top5_acc": self.mt_action_acc[1]
                     }
                 )
             stats_dict.update(
                     {
                         "Train_Epoch/visual/loss": self.visual_losses.avg,
                         "Train_Epoch/visual/action_loss": self.visual_action_losses.avg,
-                        # "Train_Epoch/visual/act_Top1_acc": self.action_acc[0],
-                        # "Train_Epoch/visual/act_Top5_acc": self.action_acc[1]
+                        "Train_Epoch/visual/act_Top1_acc": self.action_acc[0],
+                        "Train_Epoch/visual/act_Top5_acc": self.action_acc[1]
                     }
                 )
         if "audio" in self.modality:
             stats_dict.update(
                     {
                         "Train_Epoch/audio/loss": self.audio_losses.avg,
-                        # "Train_Epoch/audio/Top1_acc": self.aud_acc[0],
-                        # "Train_Epoch/audio/Top5_acc": self.aud_acc[1]
+                        "Train_Epoch/audio/Top1_acc": self.aud_acc[0],
+                        "Train_Epoch/audio/Top5_acc": self.aud_acc[1]
+                    }
+                )
+        
+        if self.dataset == 'ave' and self.modality == 'audio_visual':
+            stats_dict.update(
+                    {
+                        "Train_Epoch/combined/Top1_acc": self.combined_acc[0],
+                        "Train_Epoch/combined/Top5_acc": self.combined_acc[1]
                     }
                 )
 
@@ -322,45 +338,49 @@ class TrainMeter(object):
 
             message_str += (f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
                             '\t==========================================\n')
-            # if self.include_verb_noun:
-            #     message_str += (f'\tVisual Views Seen: {self.visual_losses.count}\n' \
-            #         '\t------------------------------------------\n' \
-            #         f'\tVisual Verb Acc@1 {self.verb_acc[0]:.3f}\n' \
-            #         f'\tVisual Verb Acc@5 {self.verb_acc[1]:.3f}\n' \
-            #         '\t------------------------------------------\n' \
-            #         f'\tVisual Noun Acc@1 {self.noun_acc[0]:.3f}\n' \
-            #         f'\tVisual Noun Acc@5 {self.noun_acc[1]:.3f}\n' \
-            #         '\t------------------------------------------\n' \
-            #         f'\tVisual Action Acc@1 {self.action_acc[0]:.3f}\n' \
-            #         f'\tVisual Action Acc@5 {self.action_acc[1]:.3f}\n' \
-            #         '\t------------------------------------------\n' \
-            #         f'\tVisual Acc@1 {self.mt_action_acc[0]:.3f}\n' \
-            #         f'\tVisual Acc@5 {self.mt_action_acc[1]:.3f}\n' \
-            #         '\t------------------------------------------\n' \
-            #         f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
-            #         '\t==========================================\n')
-            # else:
-            #     message_str += (f'\tVisual Views Seen: {self.visual_losses.count}\n' \
-            #         '\t------------------------------------------\n' \
-            #         f'\tVisual Action Acc@1 {self.action_acc[0]:.3f}\n' \
-            #         f'\tVisual Action Acc@5 {self.action_acc[1]:.3f}\n' \
-            #         '\t------------------------------------------\n' \
-            #         f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
-            #         '\t==========================================\n')
+            if self.include_verb_noun:
+                message_str += (f'\tVisual Views Seen: {self.visual_losses.count}\n' \
+                    '\t------------------------------------------\n' \
+                    f'\tVisual Verb Acc@1 {self.verb_acc[0]:.3f}\n' \
+                    f'\tVisual Verb Acc@5 {self.verb_acc[1]:.3f}\n' \
+                    '\t------------------------------------------\n' \
+                    f'\tVisual Noun Acc@1 {self.noun_acc[0]:.3f}\n' \
+                    f'\tVisual Noun Acc@5 {self.noun_acc[1]:.3f}\n' \
+                    '\t------------------------------------------\n' \
+                    f'\tVisual Action Acc@1 {self.action_acc[0]:.3f}\n' \
+                    f'\tVisual Action Acc@5 {self.action_acc[1]:.3f}\n' \
+                    '\t------------------------------------------\n' \
+                    f'\tVisual Acc@1 {self.mt_action_acc[0]:.3f}\n' \
+                    f'\tVisual Acc@5 {self.mt_action_acc[1]:.3f}\n' \
+                    '\t------------------------------------------\n' \
+                    f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
+                    '\t==========================================\n')
+            else:
+                message_str += (f'\tVisual Views Seen: {self.visual_losses.count}\n' \
+                    '\t------------------------------------------\n' \
+                    f'\tVisual Action Acc@1 {self.action_acc[0]:.3f}\n' \
+                    f'\tVisual Action Acc@5 {self.action_acc[1]:.3f}\n' \
+                    '\t------------------------------------------\n' \
+                    f'\tVisual Loss {self.visual_losses.avg:.5f}\n' \
+                    '\t==========================================\n')
         if "audio" in self.modality:
-            # message_str += (f'\tAudio Views Seen: {self.audio_losses.count}\n' \
-            #     '\t------------------------------------------\n' \
-            #     f'\tAudio Acc@1 {self.aud_acc[0]:.3f} \n' \
-            #     f'\tAudio Acc@5 {self.aud_acc[1]:.3f}\n' \
-            #     '\t------------------------------------------\n' \
-            #     f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
-            #     '\t==========================================\n')
+            message_str += (f'\tAudio Views Seen: {self.audio_losses.count}\n' \
+                '\t------------------------------------------\n' \
+                f'\tAudio Acc@1 {self.aud_acc[0]:.3f} \n' \
+                f'\tAudio Acc@5 {self.aud_acc[1]:.3f}\n' \
+                '\t------------------------------------------\n' \
+                f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
+                '\t==========================================\n')
 
             message_str += (f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
                             '\t==========================================\n')
+        if self.dataset == 'ave' and self.modality == 'audio_visual':
+            message_str += (f'\tCombined Acc@1 {self.combined_acc[0]:.3f} \n' \
+                    f'\tCombined Acc@5 {self.combined_acc[1]:.3f}\n' \
+                    '\t==========================================\n')
 
-        # message_str += (f'\tActions Seen: {(self.seen_count > 0).sum()}\n' \
-        #         '\t==========================================\n')
+        message_str += (f'\tActions Seen: {(self.seen_count > 0).sum()}\n' \
+                '\t==========================================\n')
 
         if self.include_dr_loc:
             message_str += f'\tDR Loc Loss {self.drloc_losses.avg:.5f}\n'
@@ -381,8 +401,10 @@ class InferenceMeter(object):
     def __init__(self, args, num_actions):
 
         self.best_vis_acc1 = 0
-        self.best_mt_vis_acc1 = 0
         self.best_aud_acc1 = 0
+        self.best_mt_vis_acc1 = 0
+        self.best_combined_acc1 = 0
+
         self.early_stop_period = args.early_stop_period
         self.last_best_epoch = -1
 
@@ -392,6 +414,8 @@ class InferenceMeter(object):
 
         self.action_acc = (0.0, 0.0)
         self.aud_acc = (0.0, 0.0)
+
+        self.combined_acc = (0.0, 0.0)
 
         self.iter_timer = Timer()
         self.data_timer = Timer()
@@ -404,6 +428,7 @@ class InferenceMeter(object):
         self.visual_losses = AverageMeter()
         self.audio_losses = AverageMeter()
 
+        self.dataset = args.dataset
         self.modality = args.data_modality
         self.include_verb_noun = args.include_verb_noun
 
@@ -537,14 +562,20 @@ class InferenceMeter(object):
 
             self.aud_acc = accuracy(aud_preds, aud_labels)
 
+        if self.dataset == 'ave' and self.modality == 'audio_visual':
+            combined_preds = (action_preds + aud_preds) / 2.0
+            self.combined_acc = accuracy(combined_preds, action_labels)
+
         is_best_visual = self.action_acc[0] > self.best_vis_acc1
         is_best_mt_visual = self.mt_action_acc[0] > self.best_mt_vis_acc1
         is_best_audio = self.aud_acc[0] > self.best_aud_acc1
+        is_best_combined = (self.combined_acc[0] > self.best_combined_acc1) & (self.dataset == 'ave' )
 
         best_acc1 = {
                         "visual": self.best_vis_acc1,
                         "visual_mt": self.best_mt_vis_acc1,
-                        "audio": self.best_aud_acc1
+                        "audio": self.best_aud_acc1,
+                        "combined": self.best_combined_acc1
                     }
 
         is_best = "none"
@@ -558,6 +589,9 @@ class InferenceMeter(object):
         if is_best_audio:
             is_best = "audio_" + is_best if "visual" in is_best else "audio"
             self.best_aud_acc1 = max(self.aud_acc[0], self.best_aud_acc1)
+        if self.dataset == 'ave' and is_best_combined:
+            is_best = "combined_" + is_best if is_best != "none" else "combined"
+            self.best_combined_acc1 = self.combined_acc[0]
 
         if self.early_stop_period > 0:
             stop = (epoch - self.last_best_epoch) > self.early_stop_period
@@ -638,6 +672,11 @@ class InferenceMeter(object):
                 '\t------------------------------------------\n' \
                 f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
                 '\t==========================================\n')
+        if self.dataset == 'ave' and self.modality == 'audio_visual':
+            message_str += (f'\tCombined Acc@1 {self.combined_acc[0]:.3f} \n' \
+                    f'\tCombined Acc@5 {self.combined_acc[1]:.3f}\n' \
+                    '\t==========================================\n')
+
         message_str += (f'\tActions Seen: {(self.seen_count != 0).sum()}\n' \
                 '\t==========================================')
 
@@ -679,6 +718,15 @@ class InferenceMeter(object):
                         "Val/audio/Top1_acc": self.aud_acc[0],
                         "Val/audio/Top5_acc": self.aud_acc[1],
                         "Val/max_aud_top1_acc": self.best_aud_acc1,
+                    }
+                )
+        
+        if self.dataset == 'ave' and self.modality == 'audio_visual':
+            stats_dict.update(
+                    {
+                        "Val/combined/Top1_acc": self.combined_acc[0],
+                        "Val/combined/Top5_acc": self.combined_acc[1],
+                        "Val/max_combined_top1_acc": self.best_combined_acc1,
                     }
                 )
 

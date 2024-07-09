@@ -54,6 +54,7 @@ def save_checkpoint(args, state, is_best):
         filename = "model_best_visual.pth.tar"
         torch.save(state, weights_dir / filename)
         logger.info(f"Model Saved to Path: {weights_dir / filename}")
+        
     if "mt_visual" in is_best:
         filename = "model_best_mt_visual.pth.tar"
         torch.save(state, weights_dir / filename)
@@ -61,5 +62,10 @@ def save_checkpoint(args, state, is_best):
 
     if "audio" in is_best:
         filename = "model_best_audio.pth.tar"
+        torch.save(state, weights_dir / filename)
+        logger.info(f"Model Saved to Path: {weights_dir / filename}")
+        
+    if "combined" in is_best:
+        filename = "model_best_combined.pth.tar"
         torch.save(state, weights_dir / filename)
         logger.info(f"Model Saved to Path: {weights_dir / filename}")
