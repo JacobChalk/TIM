@@ -372,8 +372,6 @@ class TrainMeter(object):
                 f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
                 '\t==========================================\n')
 
-            message_str += (f'\tAudio Loss {self.audio_losses.avg:.5f}\n' \
-                            '\t==========================================\n')
         if self.dataset == 'ave' and self.modality == 'audio_visual':
             message_str += (f'\tCombined Acc@1 {self.combined_acc[0]:.3f} \n' \
                     f'\tCombined Acc@5 {self.combined_acc[1]:.3f}\n' \
