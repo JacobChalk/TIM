@@ -46,7 +46,7 @@ A download script is provided for the videos [here](https://github.com/epic-kitc
 First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/auditory_slowfast/slowfast:$PYTHONPATH`, then run the following command:
 
 ```[bash]
-python tools/run_net.py 
+python tools/run_net.py \
 --cfg /path/to/configs/EPIC-SOUNDS/SLOWFAST_R50.yml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
@@ -123,7 +123,7 @@ Visit the official [perception_test website](https://github.com/google-deepmind/
 First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/auditory_slowfast/slowfast:$PYTHONPATH`, then run the following command:
 
 ```[bash]
-python tools/run_net.py 
+python tools/run_net.py \
 --cfg /path/to/configs/PERCEPTION/SLOWFAST_R50.yml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
@@ -197,7 +197,7 @@ To extract the audio files, please refer to [utils/extract_audio.py](utils/extra
 First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/auditory_slowfast/slowfast:$PYTHONPATH`, then run the following command:
 
 ```[bash]
-python tools/run_net.py 
+python tools/run_net.py \
 --cfg /path/to/configs/AVE/SLOWFAST_R50.yml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
