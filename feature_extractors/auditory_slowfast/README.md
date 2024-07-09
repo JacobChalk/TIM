@@ -47,7 +47,7 @@ First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/
 
 ```[bash]
 python tools/run_net.py \
---cfg /path/to/configs/EPIC-SOUNDS/SLOWFAST_R50.yml \
+--cfg /path/to/configs/EPIC-SOUNDS/SLOWFAST_R50.yaml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 EPICSOUNDS.AUDIO_DATA_FILE /path/to/EPICSOUNDS_audio_files \
@@ -124,7 +124,7 @@ First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/
 
 ```[bash]
 python tools/run_net.py \
---cfg /path/to/configs/PERCEPTION/SLOWFAST_R50.yml \
+--cfg /path/to/configs/PERCEPTION/SLOWFAST_R50.yaml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 PERCEPTION.AUDIO_DATA_DIR /path/to/PERCEPTION_audio_files \
@@ -198,7 +198,7 @@ First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/
 
 ```[bash]
 python tools/run_net.py \
---cfg /path/to/configs/AVE/SLOWFAST_R50.yml \
+--cfg /path/to/configs/AVE/SLOWFAST_R50.yaml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 AVE.AUDIO_DATA_DIR /path/to/AVE_audio_files \
