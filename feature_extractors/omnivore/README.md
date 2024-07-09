@@ -99,7 +99,7 @@ Visit the official [perception_test website](https://github.com/google-deepmind/
 First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/omnivore:$PYTHONPATH`, then run the following command:
 
 ```[bash]
-python tools/run_net.py 
+python tools/run_net.py \
 --cfg /path/to/configs/PERCEPTION_TEST/OMNIVORE_feature.yml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
@@ -164,7 +164,7 @@ To extract the frames, please refer to [utils/ave/extract_frames.py](utils/ave/e
 First, correctly configure you python path with `export PYTHONPATH=/path/to/TIM/feature_extractors/omnivore/omnivore:$PYTHONPATH`, then run the following command:
 
 ```[bash]
-python tools/run_net.py 
+python tools/run_net.py \
 --cfg /path/to/configs/AVE/OMNIVORE_feature.yml \
 NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
