@@ -19,7 +19,7 @@ def main(args):
     feature = np.load(args.feature_list,)
     metadata = pd.read_pickle(args.metafile_list)
     for i in tqdm.tqdm(range(len(metadata))):
-        annotation_id = metadata.iloc[i]['narration_id']
+        annotation_id = metadata.iloc[i].name
         vid_id = metadata.iloc[i]['video_id']
         if vid_id not in result_dict:
             result_dict[vid_id] = {}
