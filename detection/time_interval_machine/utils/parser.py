@@ -71,7 +71,7 @@ def parse_args():
                         help='pretrained model weights'
                     )
     parser.add_argument('--lambda_drloc',
-                        default=0.1,
+                        default=0.3,
                         type=float,
                         help='lambda for drloc'
                     )
