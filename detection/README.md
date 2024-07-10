@@ -126,7 +126,10 @@ python scripts/run_net.py \
 This will extract dense predictions across the validation set and save it to `/path/to/output/features/EPIC_100_validation.pth.tar`. You can then evaluate the extract predictions. First, change directory to `eval_detection`. To evaluate EPIC-100, run:
 
 ```[bash]
-python format_prediction_epic.py /path/to/output/features/EPIC_100_validation.pth.tar /path/to/groud/truth/annotations --task <task-of-model>
+python format_prediction_epic.py \
+/path/to/output/features/EPIC_100_validation.pth.tar \
+/path/to/groud/truth/annotations \
+--task <task-of-model>
 ```
 
 Where `<task-of-model>` refers to `verb` or `noun`.
@@ -152,7 +155,12 @@ python scripts/run_net.py \
 This will extract dense predictions across the validation set and save it to `/path/to/output/features/EPIC_Sounds_validation.pth.tar`. You can then evaluate the extract predictions. First, change directory to `eval_detection`. To evaluate EPIC-Sounds, run:
 
 ```[bash]
-python format_prediction.py /path/to/output/features/EPIC_SOUNDS_validation.pth.tar /path/to/groud/truth/annotations
+python format_prediction.py \
+/path/to/output/features/EPIC_SOUNDS_validation.pth.tar \
+/path/to/groud/truth/annotations\
+--score_threshold 0.03 \
+--sigma 0.25 \
+--is_audio
 ```
 
 To evaluate Perception Test Action, or Perception Test Sound run
@@ -176,7 +184,10 @@ python scripts/run_net.py \
 To extract dense predictions, then run:
 
 ```[bash]
-python format_prediction.py /path/to/output/predictions /path/to/groud/truth/annotations
+python format_prediction.py \
+/path/to/output/predictions \
+/path/to/groud/truth/annotations \
+--is_audio # Use for Perception Test Sound only
 ```
 
 **NOTE:** These scripts will run the evaluation scripts using `subprocess`, so it is important to run while in the `eval_detection` folder.
