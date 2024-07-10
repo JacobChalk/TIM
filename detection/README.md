@@ -119,7 +119,8 @@ python scripts/run_net.py \
 --audio_val_context_pickle /path/to/epic_val_audio_feature_intervals \
 --audio_input_dim <channel-size-of-audio-features> \
 --video_info_pickle /path/to/epic_kitchens_video_metadata \
---verb_only True
+--verb_only True \
+--pretrained_model /path/to/pretrained_model
 ```
 
 This will extract dense predictions across the validation set and save it to `/path/to/output/features/EPIC_100_validation.pth.tar`. You can then evaluate the extract predictions. First, change directory to `eval_detection`. To evaluate EPIC-100, run:
@@ -144,7 +145,8 @@ python scripts/run_net.py \
 --audio_val_context_pickle /path/to/epic_val_audio_feature_intervals \
 --audio_input_dim <channel-size-of-audio-features> \
 --video_info_pickle /path/to/epic_kitchens_video_metadata \
---data_modality 'audio'
+--data_modality 'audio' \
+--pretrained_model /path/to/pretrained_model
 ```
 
 This will extract dense predictions across the validation set and save it to `/path/to/output/features/EPIC_Sounds_validation.pth.tar`. You can then evaluate the extract predictions. First, change directory to `eval_detection`. To evaluate EPIC-Sounds, run:
@@ -167,7 +169,8 @@ python scripts/run_net.py \
 --audio_val_context_pickle /path/to/perception_test_val_audio_feature_intervals \
 --audio_input_dim <channel-size-of-audio-features> \
 --video_info_pickle /path/to/perception_test_video_metadata \
---data_modality 'audio' # Use only if validating Perception Test Sound
+--data_modality 'audio' # Use only if validating Perception Test Sound \
+--pretrained_model /path/to/pretrained_model
 ```
 
 To extract dense predictions, then run:
