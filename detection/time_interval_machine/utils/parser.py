@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument('--iou_threshold', type=float, default=0.6)
     parser.add_argument('--verb_only',
                         type=str2bool,
-                        default=True,
+                        default=False,
                         help='Train EPIC model on verb task only. False=Noun task only if include_verb_noun=False'
                     )
     # ------------------------------ Train ----------------------------------
