@@ -16,10 +16,10 @@ pip install -r requirements.txt
 
 We use the Auditory SlowFast model, retrained with input = 1 sec. You can replicate these as follows:
 
-- For EPIC-SOUNDS, we used the training script as described in [EPIC-SOUNDS repository](https://github.com/epic-kitchens/epic-sounds-annotations/tree/main/src) repository.
+- For EPIC-SOUNDS and Perception Test, we used the training script as described in [EPIC-SOUNDS repository](https://github.com/epic-kitchens/epic-sounds-annotations/tree/main/src) repository.
 We change the line 11~12 in [this](https://github.com/epic-kitchens/epic-sounds-annotations/blob/c61444e7abb72589d6d805042fabdaa5bd9ed765/src/configs/EPIC-Sounds/slowfast/SLOWFASTAUDIO_8x8_R50.yaml#L11) with `CLIP_SECS:0.999` and `NUM_FRAMES:200`.
-- For Perception Test and AVE, we pretrained the model with VGGSound dataset. We use the training script in [this](https://github.com/ekazakos/auditory-slow-fast) repository.
-We fixed the line 11 ~ 13 in [here](https://github.com/ekazakos/auditory-slow-fast/blob/6af3fd7277e278315ebbed1430d682dd64a3a80d/configs/VGG-Sound/SLOWFAST_R50.yaml#L11) with `CLIP_SECS:0.999` and `NUM_FRAMES:200`. Note that the sampling rate of audios in perception_test and AVE dataset we used is 16kHz. The sampling rate of EPIC-SOUNDS audios is 24kHz.
+- For AVE, we pretrained the model with VGGSound dataset. We use the training script in [this](https://github.com/ekazakos/auditory-slow-fast) repository.
+We fixed the line 11 ~ 13 in [here](https://github.com/ekazakos/auditory-slow-fast/blob/6af3fd7277e278315ebbed1430d682dd64a3a80d/configs/VGG-Sound/SLOWFAST_R50.yaml#L11) with `CLIP_SECS:0.999` and `NUM_FRAMES:200`. Note that the sampling rate of audios in Perception Test and EPIC-SOUNDS dataset we used is 24kHz. The sampling rate of AVE audios is 16kHz.
 
 We also provide these pretrained models directly in the following:
 
@@ -52,7 +52,7 @@ NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 EPICSOUNDS.AUDIO_DATA_FILE /path/to/EPICSOUNDS_audio_files \
 EPICSOUNDS.TEST_LIST /path/to/EPICSOUNDS_feature_interval_times \
-TEST.CHECKPOINT_FILE_PATH /path/to/pretrained_auditory_slowfast \
+TEST.CHECKPOINT_FILE_PATH /path/to/pretrained_epic_sounds_auditory_slowfast \
 TEST.NUM_FEATURES <num_features>
 ```
 
@@ -114,7 +114,7 @@ Visit the official [perception_test website](https://github.com/google-deepmind/
 ### Necessary files before extracting Perception Test features
 
 - audio files you downloaded from previous step
-- checkpoint file for Auditory SlowFast pretrained with VGGSound
+- checkpoint file for Auditory SlowFast pretrained with EPIC-SOUNDS
 - yaml file for model / data configuration
 - pickle file that has start and end time stamp for frame-level features
 
@@ -129,7 +129,7 @@ NUM_GPUS <num_gpus> \
 OUTPUT_DIR /path/to/output/dataset_split \
 PERCEPTION.AUDIO_DATA_DIR /path/to/PERCEPTION_audio_files \
 PERCEPTION.TEST_LIST /path/to/PERCEPTION_feature_interval_times \
-TEST.CHECKPOINT_FILE_PATH /path/to/pretrained_auditory_slowfast \
+TEST.CHECKPOINT_FILE_PATH /path/to/pretrained_epic_sounds_auditory_slowfast \
 TEST.NUM_FEATURES <num_features>
 ```
 

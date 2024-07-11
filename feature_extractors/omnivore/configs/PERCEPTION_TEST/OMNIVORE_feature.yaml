@@ -8,7 +8,7 @@ DATA:
   FRAME_SAMPLING: 'like omnivore'
   USE_RAND_AUGMENT: True
 MODEL:
-  ARCH: omnivore_swinB
+  ARCH: omnivore_swinB_epic
   MODEL_NAME: Omnivore
   LOSS_FUNC: cross_entropy
   DROPOUT_RATE: 0.5
