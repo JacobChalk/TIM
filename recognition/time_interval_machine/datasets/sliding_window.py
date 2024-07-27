@@ -16,14 +16,6 @@ def timestamp_to_seconds(timestamp):
     total_seconds = hours * 3600.00 + minutes * 60.0 + seconds
     return total_seconds
 
-def get_iou(l1, r1, l2, r2, label, mod="visual", eps=1e-8):
-    if label == -1 or (mod == "visual" and label == 97) or (mod == "audio" and label == 44):
-        return 0.0
-    # iou
-    intersection = min(r1, r2) - max(l1, l2)
-    union = max(r1, r2) - min(l1, l2)
-    return intersection / max(union, eps)
-
 def load_feats(feat_info, data_path, mode):
     feat_times = {}
     feats = {}
