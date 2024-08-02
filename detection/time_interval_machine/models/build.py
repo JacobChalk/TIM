@@ -33,6 +33,7 @@ def build_model(args, gpu_id=None):
                 data_modality=args.data_modality,
                 num_feats=args.num_feats,
                 include_verb_noun=args.include_verb_noun,
+                iou_threshold=args.iou_threshold,
                 label_smoothing=args.label_smoothing
             )
 
