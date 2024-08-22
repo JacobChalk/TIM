@@ -1,5 +1,12 @@
 # TIM: A Time Interval Machine for Audio-Visual Action Recognition - Detection Variant
 
+## Replicating Paper Results
+A previous error was discovered in the codebase, fixed by [this commit](https://github.com/JacobChalk/TIM/commit/7b69d3a8a89420db19805f5d1a1f2b0181aca384), where the IOU threshold was never passed to the model while being built, meaning the threshold for the model always adopted the default value of 0.25 as seen in [this line](https://github.com/JacobChalk/TIM/blob/b8e359ec9177d9e7d3b5eefb91ae91d1b7fab3d6/detection/time_interval_machine/models/tim.py#L33). This parameter in the model is responsible for labelling positive/negative proposals based on IOU within the model itself. In addition to this, in the training script we weighted the classification loss of positive proposals by IOU and set a weight of 1.0 for negative queries. This was done by [setting IOU values less than the passed argument as to equal 1.0](https://github.com/JacobChalk/TIM/blob/b8e359ec9177d9e7d3b5eefb91ae91d1b7fab3d6/detection/scripts/train.py#L230). 
+
+However, as the IOU threshold was never given to the model, the loss weighting and the model had different ideas of the IOU threshold. The model always saw a threshold of 0.25, thus labelling queries between 0.25 and 0.6 as positive, whereas the weighting assumed the passed args threshold of 0.6. This means positive queries which had 0.25 <= IOU < 0.6 had a weight of 1.0, but positive queries >= 0.6 had a weight equal to the IOU.
+
+This is an unintended and rather adhoc solution, but it was missed at the time of release. Hence, to replicate our detection results from the paper by training from scratch, you would need to use [this commit](https://github.com/JacobChalk/TIM/tree/b8e359ec9177d9e7d3b5eefb91ae91d1b7fab3d6) of TIM. Our pretrained weights still replicate results in the fixed codebase.
+
 ## Requirements
 
 The requirements and installation instructions for TIM can be found in the main README of this repository. For detection, in addition to the requirements, you must set up the C++ NMS using `python setup.py install --user`.
