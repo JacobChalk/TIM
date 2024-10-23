@@ -58,8 +58,7 @@ def main(args):
         omnivore_features = os.listdir(f"{args.omnivore_feature_path}/{split}")
         videomae_features = os.listdir(f"{args.videomae_feature_path}/{split}")
 
-        assert len(omnivore_features) == len(videomae_features), f"Mismatch in number of features. Omnivore: {len(omnivore_features)} != VideoMAE: {len(videomae_features)}"
-        assert omnivore_features.shape[1] == videomae_features.shape[1], f"Mismatch in number of feature sets. Omnivore: {omnivore_features.shape[1]} != VideoMAE: {videomae_features.shape[1]}"
+        assert len(omnivore_features) == len(videomae_features), f"Mismatch in number of features for split: {split}. Omnivore: {len(omnivore_features)} != VideoMAE: {len(videomae_features)}"
 
         if not os.path.exists(f"{args.output_path}/{split}"):
             os.makedirs(f"{args.output_path}/{split}", exist_ok=True)
@@ -76,12 +75,13 @@ def main(args):
 
                 if videomae_feature.ndim == 2:
                     videomae_feature = np.expand_dims(videomae_feature, axis=1)
-
-                assert omnivore_feature.shape[-1] == 1024, f"Omnivore feautre does not match expected shape [N, num_aug, 1024]. Got {omnivore_feature.shape}"
-                assert videomae_feature.shape[-1] == 1024, f"VideoMAE feautre does not match expected shape [N, num_aug, 1024]. Got {videomae_feature.shape}"
+                
+                assert omnivore_feature.shape[1] == videomae_feature.shape[1], f"Mismatch in number of feature sets for feature: {feature}. Omnivore: {omnivore_feature.shape[1]} != VideoMAE: {videomae_feature.shape[1]}"
+                assert omnivore_feature.shape[-1] == 1024, f"Omnivore feature ({feature}) does not match expected shape [N, num_aug, 1024]. Got {omnivore_feature.shape}"
+                assert videomae_feature.shape[-1] == 1024, f"VideoMAE feature ({feature}) does not match expected shape [N, num_aug, 1024]. Got {videomae_feature.shape}"
 
                 videovore_feature = np.concatenate([omnivore_feature, videomae_feature], axis=-1)
-                np.save(f"{args.output_dir}/{split}/{feature}", videovore_feature)
+                np.save(f"{args.output_path}/{split}/{feature}", videovore_feature)
             else:
                 print(f"Skipping: {feature}")
 
