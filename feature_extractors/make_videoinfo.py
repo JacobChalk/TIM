@@ -57,7 +57,7 @@ with open(out_csvfile, 'w') as f:
         cap = cv2.VideoCapture(videofile)
         fps = cap.get(cv2.CAP_PROP_FPS)
         cap.release()
-        video_length = 10.0
+        video_length = 10.0  # All videos are 10 seconds in AVE dataset. Change this for other datasets.
         row = [vid_id, video_length, fps]
         writer.writerow(row)
 
